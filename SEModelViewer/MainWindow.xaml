@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Helix="http://helix-toolkit.org/wpf"
         mc:Ignorable="d"
-        Title="SEModelViewer" Height="450" Width="800" Background="#FF212121" MinWidth="800" MinHeight="450">
+        Title="SEModelViewer" Height="540" Width="950" Background="#FF212121" MinWidth="800" MinHeight="450">
     <Grid>
         <Helix:HelixViewport3D x:Name="MainViewport" Margin="300,0,0,0" Background="#FF292929" BorderBrush="White" >
             <Helix:DefaultLights/>
@@ -22,7 +22,6 @@
                 <GridView>
                     <GridViewColumn Header="Name" Width="210" DisplayMemberBinding="{Binding Name}"/>
                     <GridViewColumn Header="Bones" Width="56" DisplayMemberBinding="{Binding BoneCount}"/>
-
                 </GridView>
             </ListView.View>
         </ListView>

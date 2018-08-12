@@ -28,6 +28,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using SELib;
 using HelixToolkit.Wpf;
+using System.Linq;
 
 namespace SEModelViewer
 {
@@ -36,6 +37,16 @@ namespace SEModelViewer
     /// </summary>
     class SEModelImporter : ModelReader
     {
+        public static string[] AcceptedImageExtensions =
+        {
+            ".PNG",
+            ".TIF",
+            ".TIFF",
+            ".JPG",
+            ".JPEG",
+            ".BMP",
+        };
+
         /// <summary>
         /// Number of Materials
         /// </summary>
@@ -167,7 +178,7 @@ namespace SEModelViewer
 
                 string image = Path.Combine(Folder, data.DiffuseMap);
 
-                if (File.Exists(image) && LoadTextures == true)
+                if (File.Exists(image) && AcceptedImageExtensions.Contains(Path.GetExtension(image).ToUpper()) && LoadTextures == true)
                 {
                     materialGroup.Children.Add(new DiffuseMaterial(CreateTextureBrush(image)));
                 }

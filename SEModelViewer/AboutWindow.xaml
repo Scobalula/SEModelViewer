@@ -10,7 +10,7 @@
     <Grid Background="#FF1B1B1B">
         <Label Content="SEModelViewer - Shows some models" HorizontalAlignment="Left" Margin="10,10,-71,0" VerticalAlignment="Top" Height="27" Width="273" Background="{x:Null}" Foreground="White"/>
         <Label Content="Developed by Scobalula" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Height="27" Width="145" Background="{x:Null}" Foreground="White"/>
-        <Label Content="Version: Pre-Release" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" Height="27" Width="145" Background="{x:Null}" Foreground="White"/>
+        <Label Content="Version: v0.1.1-Alpha" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" Height="27" Width="145" Background="{x:Null}" Foreground="White"/>
         <Button x:Name="DonateButton" Click="DonateButton_Click" Content="Donate" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Height="27" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

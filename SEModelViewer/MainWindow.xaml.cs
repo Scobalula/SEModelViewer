@@ -172,9 +172,11 @@ namespace SEModelViewer
             try
             {
                 var watch            = Stopwatch.StartNew();
-                SEModelImporter reader  = new SEModelImporter();
-                reader.LoadTextures = LoadTextures.IsChecked == true;
-                reader.Folder = Path.GetDirectoryName(modelFile.Path);
+                SEModelImporter reader = new SEModelImporter
+                {
+                    LoadTextures = LoadTextures.IsChecked == true,
+                    Folder = Path.GetDirectoryName(modelFile.Path)
+                };
 
                 using (FileStream stream = new FileStream(modelFile.Path, FileMode.Open))
                 {

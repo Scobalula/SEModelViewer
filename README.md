@@ -10,6 +10,8 @@ SEModelViewer is a tool that allows you to view SEModel files, it was primarly m
 
 Using SEModelViewer is very easy, to use SEModelViewer you can either load a folder of models by clicking "Load Folder" or load a single model by clicking "Load SEModel", the folder load method will parse all subdirectories, if loading a Wraith export, just select the "xmodels" folder as the folder to use.
 
+With a folder loaded you can click a model and use the arrow keys on your keyboard to cycle through models, you can also disable texture loading to increase model load speeds.
+
 ## Requirements
 
 * Windows 7 32bit or Above (Latest Updates)

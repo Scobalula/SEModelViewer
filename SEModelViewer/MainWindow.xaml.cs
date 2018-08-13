@@ -33,6 +33,7 @@ using System.Windows.Media.Media3D;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.Win32;
 using System.Linq;
+using System.Windows.Input;
 
 namespace SEModelViewer
 {
@@ -126,6 +127,8 @@ namespace SEModelViewer
         /// </summary>
         public Thread LoadThread { get; set; }
 
+        public List<ModelFile> LoadedModels = new List<ModelFile>();
+
         /// <summary>
         /// Loads SEModels via Dialog
         /// </summary>
@@ -217,6 +220,7 @@ namespace SEModelViewer
         private void AddModel(ModelFile model)
         {
             Dispatcher.BeginInvoke(new Action(() => ModelList.Items.Add(model)));
+            LoadedModels.Add(model);
         }
 
         /// <summary>
@@ -412,6 +416,7 @@ namespace SEModelViewer
         private void ClearLoadedModels()
         {
             LoadThread?.Abort();
+            LoadedModels.Clear();
             ModelList.Items.Clear();
             Status.Content        = "Status     : Idle";
             VertexCount.Content   = "Vertices   : 0";
@@ -484,6 +489,70 @@ namespace SEModelViewer
 
                 LoadThread = new Thread(delegate () { ProcessDroppedData(data); });
                 LoadThread.Start();
+            }
+        }
+
+        /// <summary>
+        /// Clears search on request
+        /// </summary>
+        private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            ClearSearch();
+        }
+
+        /// <summary>
+        /// Executes search on request
+        /// </summary>
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            ExecuteSearch();
+        }
+
+        /// <summary>
+        /// Executes search on enter
+        /// </summary>
+        private void SearchBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                ExecuteSearch();
+        }
+
+        /// <summary>
+        /// Handles Clearing Search and Listed Items
+        /// </summary>
+        private void ClearSearch()
+        {
+            // Check if a search was made (these would not equal)
+            if (ModelList.Items.Count != LoadedModels.Count)
+            {
+                ModelList.Items.Clear();
+                SearchBox.Clear();
+                LoadedModels.ForEach(x => ModelList.Items.Add(x));
+            }
+        }
+
+        /// <summary>
+        /// Handles executing search
+        /// </summary>
+        private void ExecuteSearch()
+        {
+            // Check if there is a query
+            if (!string.IsNullOrWhiteSpace(SearchBox.Text))
+            {
+                // Clear current list
+                ModelList.Items.Clear();
+                string[] query = SearchBox.Text.Split();
+                LoadedModels.ForEach(model =>
+                {
+                    if (query.Any(search => model.Path.Contains(search)))
+                    {
+                        ModelList.Items.Add(model);
+                    }
+                });
+            }
+            else
+            {
+                ClearSearch();
             }
         }
     }

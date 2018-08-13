@@ -41,7 +41,7 @@
         <Label x:Name="FaceCount"           Content="Faces      : 0" Margin="11,57,10,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
         <Label x:Name="MaterialCount"       Content="Materials  : 0" Margin="11,44,10,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
         <Label x:Name="BoneCount"           Content="Bones      : 0" Margin="11,31,10,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
-        <ListView x:Name="ModelList" AllowDrop="True" Drop="ModelList_Drop" Margin="0,20,0,0" SelectionChanged="ModelList_SelectionChanged" Background="#FF1F1F1F" Foreground="White" BorderBrush="#FF1D1D1D">
+        <ListView x:Name="ModelList" AllowDrop="True" Drop="ModelList_Drop" Margin="0,49,0,0" SelectionChanged="ModelList_SelectionChanged" Background="#FF1F1F1F" Foreground="White" BorderBrush="Black">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name}"/>
@@ -50,6 +50,9 @@
             </ListView.View>
         </ListView>
         <CheckBox x:Name="LoadTextures" IsChecked="True" Content="Load Textures" HorizontalAlignment="Left" Margin="11,0,0,10" VerticalAlignment="Bottom" Width="120" Foreground="White" Grid.Column="1" Height="15"/>
+        <TextBox x:Name="SearchBox" KeyDown="SearchBox_KeyDown" VerticalContentAlignment="Center" Height="29" Margin="0,20,118,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FF232323" Foreground="White" BorderBrush="Black"/>
+        <Button x:Name="SearchButton" Click="SearchButton_Click" Content="Search" Margin="198,20,61,0" VerticalAlignment="Top" Height="29" BorderBrush="Black"/>
+        <Button x:Name="ClearSearchButton" Click="ClearSearchButton_Click" Content="Clear" Margin="255,20,1,0" VerticalAlignment="Top" Height="29" BorderBrush="Black"/>
 
     </Grid>
 </Window>

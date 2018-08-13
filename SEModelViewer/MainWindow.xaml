@@ -5,33 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Helix="http://helix-toolkit.org/wpf"
         mc:Ignorable="d"
-        Title="SEModelViewer" Height="540" Width="950" Background="#FF212121" MinWidth="800" MinHeight="450">
+        Title="SEModelViewer" Height="600" Width="1000" Background="#FF212121" MinWidth="800" MinHeight="450" Closing="Window_Closing">
     <Grid>
-        <Helix:HelixViewport3D x:Name="MainViewport" Margin="300,0,0,0" Background="#FF292929" BorderBrush="White" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel VerticalAlignment="Top" Grid.ColumnSpan="2" Height="20">
+            <Menu Width="Auto" Height="20">
+                <MenuItem Header="_File" Height="20">
+                    <MenuItem x:Name="OpenSEModel" Header="_Open SEModels" Click="LoadButton_Click" HorizontalAlignment="Left" Width="200" />
+                    <MenuItem x:Name="OpenFolder" Header="_Open Folder" Click="LoadFolderButton_Click" HorizontalAlignment="Left" Width="200" />
+                    <Separator />
+                    <MenuItem x:Name="AppExit" Header="_Exit" HorizontalAlignment="Left" Width="200"/>
+                </MenuItem>
+                <MenuItem Header="_Tools">
+                    <MenuItem x:Name="LoadBoneCounts" Click="LoadModelInfo_Click" Header="_Load Bone Counts" HorizontalAlignment="Left" Width="200"/>
+                    <MenuItem x:Name="CopyAssetName" Click="CopyAssetName_Click" Header="_Copy Mode Name" HorizontalAlignment="Left" Width="200"/>
+                    <MenuItem x:Name="ShowBones" Click="BonesButton_Click" Header="_Show Model Bones" HorizontalAlignment="Left" Width="200"/>
+                    <MenuItem x:Name="ClearModels" Click="ClearModels_Click"  Header="_Clear Loaded Models" HorizontalAlignment="Left" Width="200"/>
+                    <MenuItem x:Name="AbortTask" Click="AbortTask_Click" Header="_Cancel Current Task" HorizontalAlignment="Left" Width="200"/>
+                </MenuItem>
+                <MenuItem Header="_Help">
+                    <MenuItem x:Name="About" Header="About" Click="AboutButton_Click" HorizontalAlignment="Left" Width="140"/>
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+        <Helix:HelixViewport3D AllowDrop="True" Drop="MainViewport_Drop" x:Name="MainViewport" Margin="1,20,0,0" Background="#FF292929" BorderBrush="White" Grid.Column="1" >
             <Helix:DefaultLights/>
             <ModelVisual3D x:Name="model"/>
             <Helix:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
         </Helix:HelixViewport3D>
-        <Label x:Name="Status"              Content="Status     : Idle" Margin="305,62,96,0" Foreground="Lime" FontFamily="MS Gothic" Height="23" VerticalAlignment="Top"/>
-        <Label x:Name="VertexCount"         Content="Vertices   : None" Margin="305,49,96,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top"/>
-        <Label x:Name="FaceCount"           Content="Faces      : None" Margin="305,36,96,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic"/>
-        <Label x:Name="MaterialCount"       Content="Materials  : None" Margin="305,23,96,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic"/>
-        <Label x:Name="BoneCount"           Content="Bones      : None" Margin="305,10,96,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top"/>
-        <ListView x:Name="ModelList" Margin="0,70,0,0" SelectionChanged="ModelList_SelectionChanged" Background="#FF1F1F1F" Foreground="White" BorderBrush="#FF1D1D1D" HorizontalAlignment="Left" Width="295">
+        <Label x:Name="Status"              Content="Status     : Idle" Margin="11,83,10,0" Foreground="Lime" FontFamily="MS Gothic" Height="23" VerticalAlignment="Top" Grid.Column="1"/>
+        <Label x:Name="VertexCount"         Content="Vertices   : 0" Margin="11,70,10,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
+        <Label x:Name="FaceCount"           Content="Faces      : 0" Margin="11,57,10,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
+        <Label x:Name="MaterialCount"       Content="Materials  : 0" Margin="11,44,10,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
+        <Label x:Name="BoneCount"           Content="Bones      : 0" Margin="11,31,10,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
+        <ListView x:Name="ModelList" AllowDrop="True" Drop="ModelList_Drop" Margin="0,20,0,0" SelectionChanged="ModelList_SelectionChanged" Background="#FF1F1F1F" Foreground="White" BorderBrush="#FF1D1D1D">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" Width="210" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name}"/>
                     <GridViewColumn Header="Bones" Width="56" DisplayMemberBinding="{Binding BoneCount}"/>
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Content="Bones" x:Name="BonesButton" Click="BonesButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Height="35" Margin="0,35,0,0"/>
-        <Button Content="Load Bone Counts" x:Name="LoadModelInfo" Click="LoadModelInfo_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Height="35" BorderBrush="#FF1D1D1D" Margin="150,35,0,0"/>
-        <Button Content="Load SEModel" x:Name="LoadButton" Click="LoadButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Height="35"/>
-        <Button Content="Load Folder" x:Name="LoadFolderButton" Click="LoadFolderButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Height="35" BorderBrush="#FF1D1D1D" Margin="150,0,0,0"/>
-        <Button Content="Copy Name" x:Name="CopyAssetName" Click="CopyAssetName_Click" HorizontalAlignment="Right" Margin="0,46,10,0" VerticalAlignment="Top" Width="90" Height="31"/>
-        <Button Content="About" x:Name="AboutButton" Click="AboutButton_Click" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="90" Height="31"/>
-        <CheckBox x:Name="LoadTextures" IsChecked="True" Content="Load Textures" HorizontalAlignment="Left" Margin="310,0,0,10" VerticalAlignment="Bottom" Width="120" Foreground="White"/>
+        <CheckBox x:Name="LoadTextures" IsChecked="True" Content="Load Textures" HorizontalAlignment="Left" Margin="11,0,0,10" VerticalAlignment="Bottom" Width="120" Foreground="White" Grid.Column="1" Height="15"/>
 
     </Grid>
 </Window>

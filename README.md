@@ -8,9 +8,11 @@ SEModelViewer is a tool that allows you to view SEModel files, it was primarly m
 
 ## How to Use 
 
-Using SEModelViewer is very easy, to use SEModelViewer you can either load a folder of models by clicking "Load Folder" or load a single model by clicking "Load SEModel", the folder load method will parse all subdirectories, if loading a Wraith export, just select the "xmodels" folder as the folder to use.
+Using SEModelViewer is very easy, to use SEModelViewer you can either load a folder of models by clicking File>Import Folder or load a single model/specific models by clicking File>Import SEModels, the folder load method will parse all subdirectories, if loading a Wraith export, just select the "xmodels" folder as the folder to use. While models are loading you're free to view other models, but some parts of the application may be disabled while models are loading.
 
-With a folder loaded you can click a model and use the arrow keys on your keyboard to cycle through models, you can also disable texture loading to increase model load speeds.
+With models loaded you can click a model and use the arrow keys on your keyboard to cycle through models, you can also disable texture loading to increase model load speeds.
+
+If you'd like to export models, you can use either use File>Export Select or File>Export All.
 
 ## Requirements
 
@@ -19,7 +21,7 @@ With a folder loaded you can click a model and use the arrow keys on your keyboa
 
 ## License / Disclaimers
 
-SEModelViewer is licensed under the MIT license and it and its source code is free to use and modify. SEModelViewer comes with NO warranty, any damages caused are solely the responsibility of the user. See the LICENSE file for more information.
+SEModelViewer is licensed under the GPL license and it and its source code is free to use and modify under the . SEModelViewer comes with NO warranty, any damages caused are solely the responsibility of the user. See the LICENSE file for more information.
 
 **SEModelViewer is currently in alpha, and with that in mind, bugs, errors, you know, the bad stuff.**
 
@@ -31,6 +33,7 @@ The latest version can be found on the [Releases Page](https://github.com/Scobal
 
 * DTZxPorter ([SELibDotNet](https://github.com/dtzxporter/SELibDotNet))
 * Helix Toolkit ([https://github.com/helix-toolkit/helix-toolkit](https://github.com/helix-toolkit/helix-toolkit))
+* Milosz Krajewski ([LZ4Net](https://github.com/MiloszKrajewski/lz4net))
 * Amazing people of Stackoverflow
 
 ## Support Me

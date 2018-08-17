@@ -17,7 +17,7 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,9 +25,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -48,14 +49,11 @@
     <Reference Include="HelixToolkit.Wpf, Version=2.3.0.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
       <HintPath>..\packages\HelixToolkit.Wpf.2.3.0\lib\net45\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    <Reference Include="LZ4cc">
+      <HintPath>D:\VSProjects\Rottweiler\PhilLib\PhilLib\LZ4cc.dll</HintPath>
     </Reference>
     <Reference Include="SELib">
-      <HintPath>..\..\..\..\Documents\SELibDotNet-master\src\DebugUtil\bin\Debug\SELib.dll</HintPath>
+      <HintPath>..\..\SELibDotNet\src\SELib\bin\Release\SELib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -79,30 +77,44 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BonesWindow.xaml.cs">
-      <DependentUpon>BonesWindow.xaml</DependentUpon>
+    <Compile Include="Util\Common.cs" />
+    <Compile Include="Windows\FileExportDialog.xaml.cs">
+      <DependentUpon>FileExportDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SEModelImporter.cs" />
-    <Page Include="AboutWindow.xaml">
+    <Compile Include="Windows\ModelInfoWindow.xaml.cs">
+      <DependentUpon>ModelInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\OBJExporter.cs" />
+    <Compile Include="Converters\SMDExporter.cs" />
+    <Compile Include="Converters\XMBExporter.cs" />
+    <Compile Include="Converters\XMEExporter.cs" />
+    <Compile Include="Util\SEModelImporter.cs" />
+    <Compile Include="Util\Rotation.cs" />
+    <Compile Include="Util\SettingsUtil.cs" />
+    <Page Include="Windows\AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="BonesWindow.xaml">
+    <Page Include="Windows\FileExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="Windows\ModelInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="AboutWindow.xaml.cs">
+    <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -136,6 +148,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\bone.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\material.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\main_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

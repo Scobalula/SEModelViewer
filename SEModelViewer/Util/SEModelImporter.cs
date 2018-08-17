@@ -1,24 +1,20 @@
-﻿/*
-    Copyright (c) 2018 Philip/Scobalula - SEModelViewer
+﻿// ------------------------------------------------------------------------
+// SEModelViewer - Tool to view SEModel Files
+// Copyright (C) 2018 Philip/Scobalula
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-*/
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// ------------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,13 +26,17 @@ using SELib;
 using HelixToolkit.Wpf;
 using System.Linq;
 
-namespace SEModelViewer
+namespace SEModelViewer.Util
 {
     /// <summary>
     /// SEModel Helix Importer
+    /// Handles loading SEModel Data for the Helix Viewport
     /// </summary>
     class SEModelImporter : ModelReader
     {
+        /// <summary>
+        /// Accepted Image Formats for Textures
+        /// </summary>
         public static string[] AcceptedImageExtensions =
         {
             ".PNG",
@@ -90,6 +90,11 @@ namespace SEModelViewer
         /// <summary>
         /// SEModel Materials
         /// </summary>
+        public readonly List<SEModelMaterial> SEModelMaterials = new List<SEModelMaterial>();
+
+        /// <summary>
+        /// Helix Materials
+        /// </summary>
         private readonly List<Material> Materials = new List<Material>();
 
         /// <summary>
@@ -108,7 +113,6 @@ namespace SEModelViewer
 
             MaterialCount = semodel.Materials.Count;
             BoneCount = semodel.BoneCount;
-
 
             ModelBones = new List<ModelFile.ModelBone>();
 
@@ -155,12 +159,13 @@ namespace SEModelViewer
         /// </summary>
         private void LoadBones(SEModel semodel)
         {
-            foreach(var bone in semodel.Bones)
+            for(int i = 0; i < semodel.Bones.Count; i++)
             {
                 ModelBones.Add(new ModelFile.ModelBone()
                 {
-                    Name = bone.BoneName,
-                    Position = String.Format("({0}, {1}, {2})", bone.GlobalPosition.X, bone.GlobalPosition.Y, bone.GlobalPosition.Z)
+                    Name     = semodel.Bones[i].BoneName,
+                    Index    = i,
+                    Parent   = semodel.Bones[i].BoneParent,
                 });
             }
         }
@@ -172,6 +177,8 @@ namespace SEModelViewer
         {
             foreach(var material in semodel.Materials)
             {
+                SEModelMaterials.Add(material);
+
                 var materialGroup = new MaterialGroup();
 
                 var data = material.MaterialData as SEModelSimpleMaterial;
@@ -184,7 +191,7 @@ namespace SEModelViewer
                 }
                 else
                 {
-
+                    // Assign a random color
                     materialGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb
                         (
                             (byte)RandomInt.Next(128, 255),

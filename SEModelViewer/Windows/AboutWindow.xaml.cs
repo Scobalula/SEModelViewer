@@ -15,40 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ------------------------------------------------------------------------
-using System;
-using System.IO;
 using System.Windows;
+using System.Diagnostics;
 
 namespace SEModelViewer
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for AboutWindow.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class AboutWindow : Window
     {
-        /// <summary>
-        /// Checks if we have models to process on startup
-        /// </summary>
-        protected override void OnStartup(StartupEventArgs e)
+        public AboutWindow()
         {
-            var activationData = AppDomain.CurrentDomain.SetupInformation.ActivationArguments?.ActivationData;
+            InitializeComponent();
+        }
 
-            if (activationData != null && activationData.Length > 0)
-            {
-                string path = new Uri(activationData[0]).LocalPath;
-
-                if(File.Exists(path) && Path.GetExtension(path) == ".semodel")
-                    Properties["SEModelInput"] = path;
-            }
-            else if (e.Args != null && e.Args.Length > 0)
-            {
-                string path = e.Args[0];
-
-                if (File.Exists(path) && Path.GetExtension(path) == ".semodel")
-                    Properties["SEModelInput"] = path;
-            }
-
-            base.OnStartup(e);
+        /// <summary>
+        /// Opens donate link
+        /// </summary>
+        private void DonateButton_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("http://paypal.me/Scobalula");
         }
     }
 }

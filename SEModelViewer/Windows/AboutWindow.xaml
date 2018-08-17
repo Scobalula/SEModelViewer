@@ -1,0 +1,33 @@
+﻿<!--
+    // SEModelViewer - Tool to view SEModel Files
+    // Copyright (C) 2018 Philip/Scobalula
+
+    // This program is free software: you can redistribute it and/or modify
+    // it under the terms of the GNU General Public License as published by
+    // the Free Software Foundation, either version 3 of the License, or
+    // (at your option) any later version.
+
+    // This program is distributed in the hope that it will be useful,
+    // but WITHOUT ANY WARRANTY; without even the implied warranty of
+    // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    // GNU General Public License for more details.
+
+    // You should have received a copy of the GNU General Public License
+    // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<Window x:Class="SEModelViewer.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="About SEModelViewer" Height="325.833" Width="365.333" WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize" WindowStyle="ToolWindow">
+    <Grid Background="#FF292929">
+        <Label Content="SEModelViewer - Shows some SEModel stuffs" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="10,162,10,0" VerticalAlignment="Top" Height="27" Width="339" Background="{x:Null}" Foreground="White"/>
+        <Label Content="Developed by Scobalula - SELib by DTZxPorter"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Margin="10,189,10,0" VerticalAlignment="Top" Height="27" Background="{x:Null}" Foreground="White"/>
+        <Label Content="Version: v0.5.0-Alpha"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Margin="10,216,10,0" VerticalAlignment="Top" Height="27" Background="{x:Null}" Foreground="White"/>
+        <Button x:Name="DonateButton" Click="DonateButton_Click" Content="Donate" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Height="27" VerticalAlignment="Bottom"/>
+        <Image Height="152" VerticalAlignment="Top" Source="/SEModelViewer;component/Icons/main_icon.png" Margin="100,10,100,0"/>
+    </Grid>
+</Window>

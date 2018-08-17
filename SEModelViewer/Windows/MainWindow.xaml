@@ -1,0 +1,89 @@
+﻿<!--
+    // SEModelViewer - Tool to view SEModel Files
+    // Copyright (C) 2018 Philip/Scobalula
+
+    // This program is free software: you can redistribute it and/or modify
+    // it under the terms of the GNU General Public License as published by
+    // the Free Software Foundation, either version 3 of the License, or
+    // (at your option) any later version.
+
+    // This program is distributed in the hope that it will be useful,
+    // but WITHOUT ANY WARRANTY; without even the implied warranty of
+    // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    // GNU General Public License for more details.
+
+    // You should have received a copy of the GNU General Public License
+    // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<Window x:Class="SEModelViewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Helix="http://helix-toolkit.org/wpf"
+        mc:Ignorable="d"
+        Title="SEModelViewer" Height="600" Width="1000" Background="#FF212121" MinWidth="800" MinHeight="450" Closing="Window_Closing">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="TaskBarProgress"></TaskbarItemInfo>
+    </Window.TaskbarItemInfo>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" MaxWidth="500"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel VerticalAlignment="Top" Grid.ColumnSpan="2" Height="20">
+            <Menu Width="Auto" Height="20">
+                <MenuItem Header="_File" Height="20">
+                    <MenuItem x:Name="OpenSEModel" Header="_Import SEModels" Click="LoadButton_Click" HorizontalAlignment="Left" Width="210" />
+                    <MenuItem x:Name="OpenFolder" Header="_Import Folder" Click="LoadFolderButton_Click" HorizontalAlignment="Left" Width="210" />
+                    <Separator />
+                    <MenuItem x:Name="ExportModel" Header="_Export Selected" Click="ExportModel_Click"  HorizontalAlignment="Left" Width="210" />
+                    <MenuItem x:Name="ExportAll" Header="_Export All" Click="ExportAll_Click"  HorizontalAlignment="Left" Width="210" />
+                    <Separator />
+                    <MenuItem x:Name="AppExit" Click="AppExit_Click" Header="_Exit" HorizontalAlignment="Left" Width="210"/>
+                </MenuItem>
+                <MenuItem Header="_Edit">
+                    <MenuItem x:Name="CopyAssetName" Click="CopyAssetName_Click" Header="_Copy Model Name" HorizontalAlignment="Left" Width="200"/>
+                    <MenuItem x:Name="CopyAssetFile" Click="CopyAssetFile_Click" Header="_Copy Model File" HorizontalAlignment="Left" Width="200"/>
+                    <Separator />
+                    <MenuItem x:Name="ClearModels" Click="ClearModels_Click"  Header="_Clear Loaded Models" HorizontalAlignment="Left" Width="200"/>
+                    <MenuItem x:Name="AbortTask" Click="AbortTask_Click" Header="_Cancel Current Task" HorizontalAlignment="Left" Width="200"/>
+                </MenuItem>
+                <MenuItem Header="_Help">
+                    <MenuItem x:Name="Wiki" Header="Wiki" Click="Wiki_Click"  HorizontalAlignment="Left" Width="140"/>
+                    <Separator />
+                    <MenuItem x:Name="About" Header="About" Click="AboutButton_Click" HorizontalAlignment="Left" Width="140"/>
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+        <Helix:HelixViewport3D AllowDrop="True" Drop="MainViewport_Drop" x:Name="MainViewport" Margin="1,20,0,0" BorderBrush="White" Grid.Column="1" Background="#FF2E2E2E" >
+            <Helix:HelixViewport3D.DefaultCamera>
+                <PerspectiveCamera Position="100,100,100" LookDirection="-100,-100,-100" UpDirection="0,0,1" FieldOfView="65" NearPlaneDistance="1"/>
+            </Helix:HelixViewport3D.DefaultCamera>
+            <Helix:SunLight/>
+            <ModelVisual3D x:Name="model"/>
+            <Helix:GridLinesVisual3D x:Name="ViewGrid" Width="80" Length="80" MinorDistance="2" MajorDistance="2" Thickness="0.05"/>
+        </Helix:HelixViewport3D>
+        <Label x:Name="Status"              Content="Status     : Idle" Margin="11,83,175,0" Foreground="Lime" FontFamily="MS Gothic" Height="23" VerticalAlignment="Top" Grid.Column="1"/>
+        <Label x:Name="VertexCount"         Content="Vertices   : 0" Margin="11,70,175,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
+        <Label x:Name="FaceCount"           Content="Faces      : 0" Margin="11,57,175,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
+        <Label x:Name="MaterialCount"       Content="Materials  : 0" Margin="11,44,175,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
+        <Label x:Name="BoneCount"           Content="Bones      : 0" Margin="11,31,175,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
+        <ListView x:Name="ModelList" MaxWidth="500" AllowDrop="True" Drop="ModelList_Drop" Margin="0,49,0,26" SelectionChanged="ModelList_SelectionChanged" Background="#FF1F1F1F" Foreground="White" BorderBrush="Black">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="220" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="Bones" Width="50" DisplayMemberBinding="{Binding BoneCount}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <CheckBox x:Name="LoadTextures" Checked="LoadTextures_Checked" Unchecked="LoadTextures_Checked" IsChecked="True" Content="Load Textures" HorizontalAlignment="Left" Margin="11,0,0,10" VerticalAlignment="Bottom" Width="120" Foreground="White" Grid.Column="1" Height="15" ToolTip="Load the textures when a model is loaded."/>
+        <TextBox x:Name="SearchBox" KeyDown="SearchBox_KeyDown" VerticalContentAlignment="Center" Height="29" Margin="0,20,118,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FF232323" Foreground="White" BorderBrush="Black" ToolTip="Search query, separate by spaces for multisearch."/>
+        <Button x:Name="SearchButton" Click="SearchButton_Click" Content="Search" Margin="0,20,61,0" VerticalAlignment="Top" Height="29" BorderBrush="Black" HorizontalAlignment="Right" Width="57" ToolTip="Execute search"/>
+        <Button x:Name="ClearSearchButton" Click="ClearSearchButton_Click" Content="Clear" Margin="0,20,1,0" VerticalAlignment="Top" Height="29" BorderBrush="Black" HorizontalAlignment="Right" Width="60" ToolTip="Clear search and relist all loaded models"/>
+        <Button x:Name="ModeInfoClickButton" Click="ModeInfoClickButton_Click"  Content="Model Info" Grid.Column="1" Margin="0,30,10,0" VerticalAlignment="Top" Height="27" HorizontalAlignment="Right" Width="111" ToolTip="Show model material and bone info."/>
+        <ProgressBar x:Name="TaskProgress" Height="27" VerticalAlignment="Bottom" Background="#FF1F1F1F" BorderBrush="Black" Foreground="#FF3E403F"/>
+        <CheckBox x:Name="ShowGrid" Checked="ShowGrid_Checked" Unchecked="ShowGrid_Checked"  IsChecked="True" Content="Show Grid" HorizontalAlignment="Left" Margin="131,0,0,10" VerticalAlignment="Bottom" Width="120" Foreground="White" Grid.Column="1" Height="15" ToolTip="Show the 3D Grid"/>
+        <Label x:Name="TaskLabel" Content="Idle" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Foreground="White" Height="27" ToolTip="No tasks are currently being run."/>
+    </Grid>
+</Window>

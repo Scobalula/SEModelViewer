@@ -15,40 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ------------------------------------------------------------------------
-using System;
-using System.IO;
 using System.Windows;
 
 namespace SEModelViewer
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for BonesWindow.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class ModelInfoWindow : Window
     {
-        /// <summary>
-        /// Checks if we have models to process on startup
-        /// </summary>
-        protected override void OnStartup(StartupEventArgs e)
+        public ModelInfoWindow()
         {
-            var activationData = AppDomain.CurrentDomain.SetupInformation.ActivationArguments?.ActivationData;
-
-            if (activationData != null && activationData.Length > 0)
-            {
-                string path = new Uri(activationData[0]).LocalPath;
-
-                if(File.Exists(path) && Path.GetExtension(path) == ".semodel")
-                    Properties["SEModelInput"] = path;
-            }
-            else if (e.Args != null && e.Args.Length > 0)
-            {
-                string path = e.Args[0];
-
-                if (File.Exists(path) && Path.GetExtension(path) == ".semodel")
-                    Properties["SEModelInput"] = path;
-            }
-
-            base.OnStartup(e);
+            InitializeComponent();
         }
     }
 }

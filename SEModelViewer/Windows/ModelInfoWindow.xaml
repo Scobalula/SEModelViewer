@@ -1,0 +1,29 @@
+﻿<!--
+    // SEModelViewer - Tool to view SEModel Files
+    // Copyright (C) 2018 Philip/Scobalula
+
+    // This program is free software: you can redistribute it and/or modify
+    // it under the terms of the GNU General Public License as published by
+    // the Free Software Foundation, either version 3 of the License, or
+    // (at your option) any later version.
+
+    // This program is distributed in the hope that it will be useful,
+    // but WITHOUT ANY WARRANTY; without even the implied warranty of
+    // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    // GNU General Public License for more details.
+
+    // You should have received a copy of the GNU General Public License
+    // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<Window x:Class="SEModelViewer.ModelInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Model Info" Height="350" Width="500" WindowStartupLocation="CenterOwner"
+        WindowStyle="ToolWindow">
+    <Grid Background="#FF1F1F1F">
+        <TreeView x:Name="InfoList" Background="#FF292929" BorderBrush="Black" Foreground="White"/>
+    </Grid>
+</Window>

@@ -31,7 +31,8 @@ The latest version can be found on the [Releases Page](https://github.com/Scobal
 
 ## Credits
 
-* DTZxPorter ([SELibDotNet](https://github.com/dtzxporter/SELibDotNet))
+* DTZxPorter ([SELibDotNet](https://github.com/dtzxporter/SELibDotNet)) ([PyCod](https://github.com/SE2Dev/PyCoD) (for XMODEL_BIN structure))
+* SE2Dev ([PyCod](https://github.com/SE2Dev/PyCoD) (for XMODEL_BIN structure))
 * Helix Toolkit ([https://github.com/helix-toolkit/helix-toolkit](https://github.com/helix-toolkit/helix-toolkit))
 * Milosz Krajewski ([LZ4Net](https://github.com/MiloszKrajewski/lz4net))
 * Amazing people of Stackoverflow

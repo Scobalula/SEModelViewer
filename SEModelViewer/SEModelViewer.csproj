@@ -77,7 +77,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Util\ColumnSorter.cs" />
     <Compile Include="Util\Common.cs" />
+    <Compile Include="Util\FolderUtil.cs" />
     <Compile Include="Windows\FileExportDialog.xaml.cs">
       <DependentUpon>FileExportDialog.xaml</DependentUpon>
     </Compile>

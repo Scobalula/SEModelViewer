@@ -29,11 +29,12 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using System.Linq;
-using System.Windows.Input;
 using SEModelViewer.Util;
 using SEModelViewer.Windows;
 using SELib;
-
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Reflection;
 
 namespace SEModelViewer
 {
@@ -45,9 +46,14 @@ namespace SEModelViewer
         #region Properties
 
         /// <summary>
-        /// Active Load Thread
+        /// Number of Models found by Folder Loader
         /// </summary>
-        private Thread LoadThread { get; set; }
+        private int ModelsFound = 0;
+
+        /// <summary>
+        /// Active Thread
+        /// </summary>
+        private Thread ActiveThread { get; set; }
 
         /// <summary>
         /// Watcher Variable for current active thread whether to end or not
@@ -57,7 +63,22 @@ namespace SEModelViewer
         /// <summary>
         /// Loaded Models
         /// </summary>
-        private Dictionary<string, ModelFile> LoadedModels = new Dictionary<string, ModelFile>();
+        private List<ModelFile> LoadedModels = new List<ModelFile>();
+
+        /// <summary>
+        /// Collection View (For Filtering)
+        /// </summary>
+        public static CollectionView View { get; set; }
+
+        /// <summary>
+        /// Sort Column (for Sorting)
+        /// </summary>
+        private GridViewColumnHeader ModelListSortColumn = null;
+
+        /// <summary>
+        /// Sort Adorner (for Sorting)
+        /// </summary>
+        private SortAdorner ModelListSortAdorner = null;
 
         #endregion
 
@@ -68,7 +89,11 @@ namespace SEModelViewer
         /// </summary>
         public MainWindow()
         {
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             InitializeComponent();
+            ModelList.ItemsSource = LoadedModels;
+            View = CollectionViewSource.GetDefaultView(ModelList.ItemsSource) as CollectionView;
+            View.Filter = ViewFilter;
             Settings.Load("settings.smvcfg");
             LoadTextures.IsChecked = Settings.Get("loadtexture", "yes") == "yes";
             ShowGrid.IsChecked = Settings.Get("showgrid", "yes") == "yes";
@@ -93,8 +118,57 @@ namespace SEModelViewer
         /// <summary>
         /// Loads SEModels from a Folder and all subfolders.
         /// </summary>
-        private void LoadDirectory(string folder)
+        private List<ModelFile> LoadDirectory(string folder)
         {
+            var dirInfo = new DirectoryInfo(folder);
+
+            List<ModelFile> models = new List<ModelFile>();
+
+            if(dirInfo.Name == "xmodels")
+            {
+                var result = MessageBox.Show(
+                    "SEModelViewer has noticed the folder you dropped on is called \"xmodels\".\n\nIf this folder is from Wraith, SEModelViewer can skip scanning the sub-directories and assume each model holds the same name as the folder with its LOD indices to speed up load time.\n\nDo you want SEModelViewer to do that?", "SEModelViewer", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    var dirs = dirInfo.GetDirectories();
+
+                    foreach (var dir in dirs)
+                    {
+                        if (EndThread)
+                            return models;
+
+                        var model = new ModelFile()
+                        {
+                            Path = Path.Combine(dir.FullName, dir.Name + "_LOD0.semodel"),
+                            BoneCount = 0,
+                        };
+
+                        if (!LoadedModels.Contains(model))
+                            models.Add(model);
+                    }
+                }
+                else if(result == MessageBoxResult.No)
+                {
+                    models.AddRange(LoadDirectories(folder));
+                }
+            }
+            else
+            {
+                models.AddRange(LoadDirectories(folder));
+            }
+
+            ModelsFound = 0;
+            return models;
+        }
+
+        /// <summary>
+        /// Loads SEModels from a Folder and all subfolders.
+        /// </summary>
+        private List<ModelFile> LoadDirectories(string folder)
+        {
+            List<ModelFile> models = new List<ModelFile>();
+
             IEnumerable<string> files = Directory.EnumerateFiles(folder);
 
             foreach (string file in files)
@@ -102,8 +176,22 @@ namespace SEModelViewer
                 if (EndThread)
                     break;
 
-                if (Path.GetExtension(file) == ".semodel")
-                    ProcessModel(file);
+
+                if (file.EndsWith(".semodel"))
+                {
+                    var model = new ModelFile()
+                    {
+                        Path = file,
+                        BoneCount = 0,
+                    };
+
+                    if (!LoadedModels.Contains(model))
+                    {
+                        models.Add(model);
+                        ModelsFound++;
+                        Dispatcher.BeginInvoke(new Action(() => TaskLabel.Content = String.Format("Found {0} models....", ModelsFound)));
+                    }
+                }
             }
 
 
@@ -111,11 +199,17 @@ namespace SEModelViewer
 
             foreach (string directory in directories)
             {
+                // Skip Texture Folders
+                if (directory.EndsWith("_images"))
+                    continue;
+
                 if (EndThread)
                     break;
 
-                LoadDirectory(directory);
+                models.AddRange(LoadDirectories(directory));
             }
+
+            return models;
         }
 
         /// <summary>
@@ -141,7 +235,7 @@ namespace SEModelViewer
             {
                 TaskLabel.Content = "Converting Models...";
                 TaskBarProgress.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
-                LoadThread = new Thread(delegate ()
+                ActiveThread = new Thread(delegate ()
                 {
                     for (int i = 0; i < modelFiles.Count && !EndThread; i++)
                     {
@@ -168,10 +262,9 @@ namespace SEModelViewer
                                 break;
                         }
                     }
-                    EndThread = false;
                     ResetProgress();
                 });
-                LoadThread.Start();
+                ActiveThread.Start();
             }
         }
 
@@ -180,25 +273,17 @@ namespace SEModelViewer
         /// </summary>
         private void AddModel(ModelFile model, bool drawModel)
         {
-            Dispatcher.BeginInvoke(new Action(() =>
+            if (!LoadedModels.Contains(model))
             {
-                if (!LoadedModels.ContainsKey(model.Name))
-                {
-                    LoadedModels.Add(model.Name, model);
-                    ModelList.Items.Add(model);
-                }
-                else
-                {
-                    model = LoadedModels[model.Name];
-                }
+                LoadedModels.Add(model);
+            }
 
-                if (drawModel)
-                {
-                    ModelList.SelectedItem = model;
-                    ModelList.ScrollIntoView(model);
-                    DrawModel(model);
-                }
-            }));
+            if (drawModel)
+            {
+                ModelList.SelectedItem = model;
+                ModelList.ScrollIntoView(model);
+                DrawModel(model);
+            }
         }
 
         /// <summary>
@@ -213,14 +298,11 @@ namespace SEModelViewer
             };
 
             AddModel(model, drawModel);
-
-            LoadBoneCount(model);
         }
 
         /// <summary>
-        /// Loads an OBJ File, if it fails the model is not displayed.
+        /// Loads an SEModel File, if it fails the model is not displayed.
         /// </summary>
-        /// <param name="filePath"></param>
         private void DrawModel(ModelFile modelFile)
         {
             if (modelFile == null)
@@ -240,6 +322,7 @@ namespace SEModelViewer
                     Model3DGroup loadedModel = reader.Read(stream);
                     modelFile.Materials = reader.SEModelMaterials;
                     modelFile.ModelBones = reader.ModelBones;
+                    modelFile.BoneCount = (int)reader.BoneCount;
                     model.Content = loadedModel;
                     MainViewport.ZoomExtents(0);
                 }
@@ -266,6 +349,37 @@ namespace SEModelViewer
         }
 
         /// <summary>
+        /// Loads Bone Counts of all loaded SEModels
+        /// </summary>
+        private void LoadBoneCounts(List<ModelFile> modelFiles)
+        {
+            byte[] buffer = new byte[18];
+
+            foreach (var modelFile in modelFiles)
+            {
+                if (EndThread)
+                    break;
+
+                try
+                {
+                    // Only load if the previous bone count has not been loaded
+                    if (!modelFile.BoneCountLoaded)
+                    {
+                        using (var stream = new FileStream(modelFile.Path, FileMode.Open)) stream.Read(buffer, 0, buffer.Length);
+                        modelFile.BoneCount = BitConverter.ToInt32(buffer, 14);
+                        modelFile.BoneCountLoaded = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e);
+                    modelFile.BoneCount = -1;
+                    modelFile.BoneCountLoaded = false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Loads Bone Count from the header of a SEModel file
         /// </summary>
         private void LoadBoneCount(ModelFile modelFile)
@@ -282,13 +396,14 @@ namespace SEModelViewer
                     modelFile.BoneCountLoaded = true;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Trace.WriteLine(e);
                 modelFile.BoneCount = -1;
                 modelFile.BoneCountLoaded = false;
             }
         }
+
 
         /// <summary>
         /// Recursively builds a tree from bones
@@ -359,10 +474,10 @@ namespace SEModelViewer
         /// </summary>
         private void ClearLoadedModels()
         {
-            EndThread = true;
-            LoadedModels.Clear();
-            ModelList.Items.Clear();
+            AbortTask_Click(null, null);
+            LoadedModels?.Clear();
             ClearDrawnModel();
+            RefreshModelList();
         }
 
         /// <summary>
@@ -410,30 +525,19 @@ namespace SEModelViewer
         }
 
         /// <summary>
-        /// Processes Dropped Data
+        /// Processes Folder
         /// </summary>
-        private void ProcessDroppedData(string[] paths)
+        private void LoadFolder(string path)
         {
-            foreach (string path in paths)
+            ActiveThread = new Thread(() =>
             {
-                try
-                {
-                    if (Path.GetExtension(path) == ".semodel" && File.Exists(path))
-                    {
-                        ProcessModel(path, paths.Length == 1);
-                    }
-                    else if (Directory.Exists(path))
-                    {
-                        LoadDirectory(path);
-                    }
-                }
-                catch(Exception e)
-                {
-                    Trace.WriteLine(e);
-                }
-            }
-
-            ResetProgress();
+                LoadedModels.AddRange(LoadDirectory(path));
+                RefreshModelList();
+                Dispatcher.BeginInvoke(new Action(() => TaskLabel.Content = "Loading Bone Counts..."));
+                LoadBoneCounts(LoadedModels);
+                Dispatcher.BeginInvoke(new Action(() => TaskLabel.Content = "Idle"));
+            });
+            ActiveThread.Start();
         }
 
         /// <summary>
@@ -458,62 +562,6 @@ namespace SEModelViewer
             // Purge trailing bar
             return result.Remove(result.Length - 1);
 
-        }
-
-        /// <summary>
-        /// Handles Clearing Search and Listed Items
-        /// </summary>
-        private void ClearSearch()
-        {
-            SearchBox.Text = "";
-
-            if (LoadThread?.IsAlive == true)
-            {
-                MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // Check if a search was made (these would not equal)
-            if (ModelList.Items.Count != LoadedModels.Count)
-            {
-                ModelList.Items.Clear();
-                SearchBox.Clear();
-                foreach (var model in LoadedModels)
-                    ModelList.Items.Add(model.Value);
-            }
-
-            EndThread = false;
-        }
-
-        /// <summary>
-        /// Handles executing search
-        /// </summary>
-        private void ExecuteSearch()
-        {
-            if (LoadThread?.IsAlive == true)
-            {
-                MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // Check if there is a query
-            if (!string.IsNullOrWhiteSpace(SearchBox.Text))
-            {
-                // Clear current list
-                ModelList.Items.Clear();
-                string[] query = SearchBox.Text.Split();
-                foreach (var model in LoadedModels)
-                {
-                    if (query.Any(search => model.Value.Name.Contains(search)))
-                    {
-                        ModelList.Items.Add(model.Value);
-                    }
-                }
-            }
-            else
-            {
-                ClearSearch();
-            }
         }
 
         #endregion
@@ -562,7 +610,7 @@ namespace SEModelViewer
         /// </summary>
         private void LoadFolderButton_Click(object sender, RoutedEventArgs e)
         {
-            if (LoadThread?.IsAlive == true)
+            if (ActiveThread?.IsAlive == true)
             {
                 MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -578,11 +626,9 @@ namespace SEModelViewer
                 !string.IsNullOrWhiteSpace(folderDialog.SelectedPath) &&
                 Directory.Exists(folderDialog.SelectedPath))
             {
-                ModelList.Items.Clear();
-                TaskProgress.IsIndeterminate = true;
                 TaskLabel.Content = "Loading models...";
-                LoadThread = new Thread(delegate () { LoadDirectory(Path.GetDirectoryName(folderDialog.SelectedPath)); EndThread = false; });
-                LoadThread.Start();
+                EndThread = false;
+                LoadFolder(folderDialog.SelectedPath);
             }
         }
 
@@ -591,7 +637,7 @@ namespace SEModelViewer
         /// </summary>
         private void ExportModel_Click(object sender, RoutedEventArgs e)
         {
-            if (LoadThread?.IsAlive == true)
+            if (ActiveThread?.IsAlive == true)
             {
                 MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -645,7 +691,7 @@ namespace SEModelViewer
         /// <param name="e"></param>
         private void ExportAll_Click(object sender, RoutedEventArgs e)
         {
-            if (LoadThread?.IsAlive == true)
+            if (ActiveThread?.IsAlive == true)
             {
                 MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -657,6 +703,8 @@ namespace SEModelViewer
                 return;
             }
 
+            EndThread = false;
+
             ExportMultiple(ModelList.Items.Cast<ModelFile>().ToList());
         }
 
@@ -667,7 +715,7 @@ namespace SEModelViewer
         {
             if (ModelList.SelectedItems.Count == 0)
             {
-                MessageBox.Show("Please select a select or load a model first.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please select/load a model first.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -739,7 +787,7 @@ namespace SEModelViewer
         /// </summary>
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            if (LoadThread?.IsAlive == true)
+            if (ActiveThread?.IsAlive == true)
             {
                 MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -752,26 +800,27 @@ namespace SEModelViewer
                 Title = "Select SEModel Files"
             };
 
+            EndThread = false;
+
             if (openFileDialog.ShowDialog() == true)
             {
-                if(openFileDialog.FileNames.Length < 2)
+                foreach(var file in openFileDialog.FileNames)
                 {
-                    ProcessModel(openFileDialog.FileName, true);
-                }
-                else
-                {
-                    LoadThread = new Thread(delegate ()
+                    var model = new ModelFile()
                     {
-                        foreach (string file in openFileDialog.FileNames)
-                        {
-                            ProcessModel(file);
-                        }
+                        Path = file,
+                        BoneCount = 0,
+                    };
 
-                        EndThread = false;
-                    });
-                    LoadThread.Start();
+                    if (!LoadedModels.Contains(model))
+                    {
+                        LoadedModels.Add(model);
+                        LoadBoneCount(model);
+                    }
                 }
             }
+
+            RefreshModelList();
         }
 
         /// <summary>
@@ -784,6 +833,7 @@ namespace SEModelViewer
             TaskProgress.Value = 0;
             TaskLabel.Content = "Idle";
             EndThread = true;
+            ActiveThread?.Join(1500);
         }
 
         /// <summary>
@@ -805,22 +855,6 @@ namespace SEModelViewer
             }.ShowDialog();
         }
 
-        /// <summary>
-        /// Clears search on request
-        /// </summary>
-        private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            ClearSearch();
-        }
-
-        /// <summary>
-        /// Executes search on request
-        /// </summary>
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            ExecuteSearch();
-        }
-
         #endregion
 
         #region FileDropOperations
@@ -830,11 +864,13 @@ namespace SEModelViewer
         /// </summary>
         private void MainViewport_Drop(object sender, DragEventArgs e)
         {
-            if (LoadThread?.IsAlive == true)
+            if (ActiveThread?.IsAlive == true)
             {
                 MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            EndThread = false;
 
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -845,6 +881,7 @@ namespace SEModelViewer
                     if (Path.GetExtension(file) == ".semodel" && File.Exists(file))
                     {
                         ProcessModel(file, true);
+                        RefreshModelList();
                         break;
                     }
                 }
@@ -856,21 +893,39 @@ namespace SEModelViewer
         /// </summary>
         private void ModelList_Drop(object sender, DragEventArgs e)
         {
-            if (LoadThread?.IsAlive == true)
+            if (ActiveThread?.IsAlive == true)
             {
                 MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
+            EndThread = false;
+
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] data = (string[])e.Data.GetData(DataFormats.FileDrop);
-                TaskProgress.IsIndeterminate = true;
-                TaskBarProgress.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Indeterminate;
-                TaskLabel.Content = "Loading models...";
-                LoadThread = new Thread(delegate () { ProcessDroppedData(data); EndThread = false; });
-                LoadThread.Start();
+                foreach(string path in data)
+                {
+                    if (EndThread)
+                        return;
+
+                    if(File.Exists(path))
+                    {
+                        if(Path.GetExtension(path) == ".semodel")
+                        {
+                            ProcessModel(path, true);
+                            break;
+                        }
+                    }
+                    else if(Directory.Exists(path))
+                    {
+                        LoadFolder(path);
+                        break;
+                    }
+                }
             }
+
+            RefreshModelList();
         }
 
         #endregion
@@ -895,19 +950,64 @@ namespace SEModelViewer
             TaskBarProgress.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
             TaskProgress.Value = 0;
             TaskLabel.Content = "Idle";
+            Settings.Save("settings.smvcfg");
             EndThread = true;
-            Settings.Save("settings.cfg");
-            // If thread doesn't quit after 1.5 seconds, abort it
-            LoadThread?.Join(1500);
+            ActiveThread?.Join(1500);
+        }
+
+
+        /// <summary>
+        /// Updates Filter on Search
+        /// </summary>
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(ModelList.ItemsSource)?.Refresh();
         }
 
         /// <summary>
-        /// Executes search on enter
+        /// Filters Models by text in Search Box
         /// </summary>
-        private void SearchBox_KeyDown(object sender, KeyEventArgs e)
+        public bool ViewFilter(object obj)
         {
-            if (e.Key == Key.Enter)
-                ExecuteSearch();
+            return string.IsNullOrEmpty(SearchBox.Text) ? true : (obj.ToString().IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
+        /// <summary>
+        /// Sorts Column on click
+        /// </summary>
+        private void ColumnClick(object sender, RoutedEventArgs e)
+        {
+            GridViewColumnHeader column = (sender as GridViewColumnHeader);
+            string sortBy = column.Tag.ToString();
+
+            if (ModelListSortColumn != null)
+            {
+                AdornerLayer.GetAdornerLayer(ModelListSortColumn).Remove(ModelListSortAdorner);
+                ModelList.Items.SortDescriptions.Clear();
+            }
+
+            ListSortDirection newDir = ListSortDirection.Ascending;
+
+            if (ModelListSortColumn == column && ModelListSortAdorner.Direction == newDir)
+                newDir = ListSortDirection.Descending;
+
+            ModelListSortColumn = column;
+            ModelListSortAdorner = new SortAdorner(ModelListSortColumn, newDir);
+            AdornerLayer.GetAdornerLayer(ModelListSortColumn).Add(ModelListSortAdorner);
+            ModelList.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+        }
+
+        /// <summary>
+        /// Refreshes Model List
+        /// </summary>
+        public void RefreshModelList()
+        {
+            Dispatcher.BeginInvoke(new Action(() => CollectionViewSource.GetDefaultView(ModelList.ItemsSource)?.Refresh()));
+        }
+
+        public void ClearSearch()
+        {
+            SearchBox.Text = "";
         }
 
         #endregion

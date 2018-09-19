@@ -105,7 +105,7 @@ namespace SEModelViewer.Windows
             };
 
             if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(folderDialog.SelectedPath))
-                OutputFolder.Text = Path.GetDirectoryName(folderDialog.SelectedPath);
+                OutputFolder.Text = folderDialog.SelectedPath;
         }
     }
 }

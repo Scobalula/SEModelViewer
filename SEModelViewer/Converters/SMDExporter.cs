@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using System.Linq;
 using SEModelViewer.Util;
+using SELib.Utilities;
 using SELib;
 
 namespace SEModelViewer.Converters
@@ -39,6 +40,22 @@ namespace SEModelViewer.Converters
         }
 
         #region HelperFunctions
+
+        /// <summary>
+        /// Normalizes Vertex Normal
+        /// </summary>
+        private static void NormalizeVertexNormal(Vector3 input)
+        {
+            var length = Math.Sqrt(
+                input.X * input.X +
+                input.Y * input.Y +
+                input.Z * input.Z
+                );
+
+            input.X /= length;
+            input.Y /= length;
+            input.Z /= length;
+        }
 
         /// <summary>
         /// Writes comment block 
@@ -116,6 +133,8 @@ namespace SEModelViewer.Converters
         /// <param name="vertex"></param>
         private static void WriteFacePoint(StreamWriter writer, SEModelVertex vertex)
         {
+            NormalizeVertexNormal(vertex.VertexNormal);
+
             writer.Write("0");
             writer.Write(" {0:0.000000} {1:0.000000} {2:0.000000}",
                 Common.CMToInch(vertex.Position.X),
@@ -145,9 +164,10 @@ namespace SEModelViewer.Converters
         /// </summary>
         /// <param name="inputPath">Input SEModel Path</param>
         /// <param name="outputPath">Output file path</param>
-        public override void FromSEModel(string inputPath, string outputPath)
+        public override SEModel FromSEModel(string inputPath, string outputPath)
         {
             SEModel model = SEModel.Read(inputPath);
+
             using (StreamWriter writer = new StreamWriter(outputPath))
             {
                 WriteVersionBlock(writer, 1);
@@ -158,6 +178,8 @@ namespace SEModelViewer.Converters
                 WriteNodes(writer, model);
                 WriteTriangleBlocks(writer, model);
             }
+
+            return model;
         }
     }
 }

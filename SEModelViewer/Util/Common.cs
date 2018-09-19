@@ -100,6 +100,19 @@ namespace SEModelViewer.Util
             }
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is ModelFile modelFile)
+                return modelFile.Path == Path;
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -149,7 +162,7 @@ namespace SEModelViewer.Util
         /// </summary>
         /// <param name="inputPath">Input SEModel Path</param>
         /// <param name="outputPath">Output file path</param>
-        public virtual void FromSEModel(string inputPath, string outputPath) { }
+        public virtual SEModel FromSEModel(string inputPath, string outputPath) { return new SEModel(); }
 
         /// <summary>
         /// Registers the Model Converter 
@@ -189,6 +202,9 @@ namespace SEModelViewer.Util
         /// </summary>
         public static bool IsValidPath(string path)
         {
+            if (path == "")
+                return true;
+
             try
             {
                 // if a file exists with same name it can result in bad stuffs for folders
@@ -204,6 +220,33 @@ namespace SEModelViewer.Util
 
             return true;
         }
+
+        public static void CopyImages(SEModel model, string inputDirectory, string outputDirectory)
+        {
+            outputDirectory = Path.Combine(outputDirectory, "_images");
+
+            Directory.CreateDirectory(outputDirectory);
+
+            foreach (var material in model.Materials)
+            {
+                var data = material.MaterialData as SEModelSimpleMaterial;
+
+                string[] images = {
+                    Path.Combine(inputDirectory, data.DiffuseMap),
+                    Path.Combine(inputDirectory, data.NormalMap),
+                    Path.Combine(inputDirectory, data.SpecularMap),
+                };
+
+                foreach(string image in images)
+                {
+                    if(File.Exists(image))
+                    {
+                        File.Copy(image, Path.Combine(outputDirectory, Path.GetFileName(image)), true);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Converts a Model to the given format
         /// </summary>
@@ -223,8 +266,14 @@ namespace SEModelViewer.Util
             Directory.CreateDirectory(outputDirectory);
 
             if (File.Exists(modelFile.Path))
-                if (!File.Exists(outputPath) || overwrite)
-                    converter.FromSEModel(modelFile.Path, outputPath + converter.Extension);
+            {
+                if (File.Exists(outputPath) || !overwrite)
+                    return;
+
+                var model = converter.FromSEModel(modelFile.Path, outputPath + converter.Extension);
+
+                if (copyImage) CopyImages(model, inputDirectory, outputDirectory);
+            }
         }
 
         /// <summary>

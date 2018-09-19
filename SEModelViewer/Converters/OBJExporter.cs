@@ -41,7 +41,7 @@ namespace SEModelViewer.Converters
         /// </summary>
         /// <param name="inputPath">Input SEModel Path</param>
         /// <param name="outputPath">Output file path</param>
-        public override void FromSEModel(string inputPath, string outputPath)
+        public override SEModel FromSEModel(string inputPath, string outputPath)
         {
             SEModel model = SEModel.Read(inputPath);
 
@@ -88,6 +88,8 @@ namespace SEModelViewer.Converters
                     globalVertexIndex += mesh.VertexCount;
                 }
             }
+
+            return model;
         }
     }
 }

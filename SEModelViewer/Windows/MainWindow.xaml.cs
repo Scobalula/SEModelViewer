@@ -35,6 +35,10 @@ using SELib;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Reflection;
+using System.Windows.Input;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using HelixToolkit.Wpf;
 
 namespace SEModelViewer
 {
@@ -97,6 +101,7 @@ namespace SEModelViewer
             Settings.Load("settings.smvcfg");
             LoadTextures.IsChecked = Settings.Get("loadtexture", "yes") == "yes";
             ShowGrid.IsChecked = Settings.Get("showgrid", "yes") == "yes";
+            UseYUpAxis.IsChecked = Settings.Get("yupaxis", "no") == "yes";
             ViewGrid.Visible = Settings.Get("showgrid", "yes") == "yes";
             ModelConverter.RegisterModelConverters();
             Loaded += new RoutedEventHandler(MainWindow_OnLoad);
@@ -124,10 +129,10 @@ namespace SEModelViewer
 
             List<ModelFile> models = new List<ModelFile>();
 
-            if(dirInfo.Name == "xmodels")
+            if(dirInfo.Name.Contains("models"))
             {
                 var result = MessageBox.Show(
-                    "SEModelViewer has noticed the folder you dropped on is called \"xmodels\".\n\nIf this folder is from Wraith, SEModelViewer can skip scanning the sub-directories and assume each model holds the same name as the folder with its LOD indices to speed up load time.\n\nDo you want SEModelViewer to do that?", "SEModelViewer", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
+                    "SEModelViewer has noticed the folder you dropped on is contains the term \"models\".\n\nIf this folder is from Wraith, Greyhound, or Legion, SEModelViewer can skip scanning the sub-directories and assume each model holds the same name as the folder with its LOD indices to speed up load time.\n\nDo you want SEModelViewer to do that?", "SEModelViewer", MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
 
                 if (result == MessageBoxResult.Yes)
                 {
@@ -213,62 +218,6 @@ namespace SEModelViewer
         }
 
         /// <summary>
-        /// Exports a list of models 
-        /// </summary>
-        private void ExportMultiple(List<ModelFile> modelFiles)
-        {
-            FileExportDialog dialog = new FileExportDialog()
-            {
-                Owner = this,
-                Title = String.Format("Export {0} models", modelFiles.Count),
-            };
-
-            dialog.ShowDialog();
-
-            ModelConverter converter = dialog.Formats.SelectedItem as ModelConverter;
-
-            Settings.Set("extension", converter.Extension);
-
-            string outputFolder = dialog.OutputFolder.Text;
-
-            if (dialog.ClosedByButton)
-            {
-                TaskLabel.Content = "Converting Models...";
-                TaskBarProgress.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
-                ActiveThread = new Thread(delegate ()
-                {
-                    for (int i = 0; i < modelFiles.Count && !EndThread; i++)
-                    {
-                        UpdateProgress(((double)i / modelFiles.Count) * 100);
-                        try
-                        {
-                            Common.ConvertModel(
-                                modelFiles[i],
-                                outputFolder,
-                                Settings.Get("overwrite", "yes") == "yes",
-                                Settings.Get("copyimage", "yes") == "yes",
-                                Settings.Get("newfolder", "yes") == "yes",
-                                converter,
-                                Settings.Get("exportprefix", ""));
-                        }
-                        catch (Exception e)
-                        {
-                            Trace.WriteLine(e);
-                            if (MessageBox.Show(
-                                String.Format("Error occured while converting {0}:\n\n{1}\n\nContinue?", modelFiles[i].Name, e), 
-                                "ERROR", 
-                                MessageBoxButton.YesNo, 
-                                MessageBoxImage.Error) == MessageBoxResult.No)
-                                break;
-                        }
-                    }
-                    ResetProgress();
-                });
-                ActiveThread.Start();
-            }
-        }
-
-        /// <summary>
         /// Adds a model to the UI List
         /// </summary>
         private void AddModel(ModelFile model, bool drawModel)
@@ -314,6 +263,7 @@ namespace SEModelViewer
                 SEModelImporter reader = new SEModelImporter
                 {
                     LoadTextures = LoadTextures.IsChecked == true,
+                    UpAxis = UseYUpAxis.IsChecked == true ? "Y" : "Z",
                     Folder = Path.GetDirectoryName(modelFile.Path)
                 };
 
@@ -333,12 +283,12 @@ namespace SEModelViewer
                 FaceCount.Content     = string.Format("Faces      : {0}", reader.FaceCount);
                 MaterialCount.Content = string.Format("Materials  : {0}", reader.MaterialCount);
                 BoneCount.Content     = string.Format("Bones      : {0}", reader.BoneCount);
-                Status.Foreground = new SolidColorBrush(Colors.Lime);
+                Status.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFABB6C3"));
             }
             catch (Exception e)
             {
                 Trace.WriteLine(e);
-                Status.Content        = string.Format("Status     : Error - {0}", e.Message);
+                Status.Content        = string.Format("Status     : Error - {0}", e.Message.Replace("\\", "\\\\"));
                 VertexCount.Content   = string.Format("Vertices   : 0");
                 FaceCount.Content     = string.Format("Faces      : 0");
                 MaterialCount.Content = string.Format("Materials  : 0");
@@ -355,10 +305,13 @@ namespace SEModelViewer
         {
             byte[] buffer = new byte[18];
 
+            int i = 0;
+
             foreach (var modelFile in modelFiles)
             {
                 if (EndThread)
                     break;
+                UpdateProgress(((double)i / modelFiles.Count) * 100);
 
                 try
                 {
@@ -376,6 +329,8 @@ namespace SEModelViewer
                     modelFile.BoneCount = -1;
                     modelFile.BoneCountLoaded = false;
                 }
+
+                i++;
             }
         }
 
@@ -474,7 +429,7 @@ namespace SEModelViewer
         /// </summary>
         private void ClearLoadedModels()
         {
-            AbortTask_Click(null, null);
+            AbortTaskClick(null, null);
             LoadedModels?.Clear();
             ClearDrawnModel();
             RefreshModelList();
@@ -491,7 +446,7 @@ namespace SEModelViewer
             FaceCount.Content     = "Faces      : 0";
             MaterialCount.Content = "Materials  : 0";
             BoneCount.Content     = "Bones      : 0";
-            Status.Foreground = new SolidColorBrush(Colors.Lime);
+            Status.Foreground     = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFABB6C3"));
         }
 
         /// <summary>
@@ -529,6 +484,7 @@ namespace SEModelViewer
         /// </summary>
         private void LoadFolder(string path)
         {
+            TaskBarProgress.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
             ActiveThread = new Thread(() =>
             {
                 LoadedModels.AddRange(LoadDirectory(path));
@@ -536,32 +492,9 @@ namespace SEModelViewer
                 Dispatcher.BeginInvoke(new Action(() => TaskLabel.Content = "Loading Bone Counts..."));
                 LoadBoneCounts(LoadedModels);
                 Dispatcher.BeginInvoke(new Action(() => TaskLabel.Content = "Idle"));
+                ResetProgress();
             });
             ActiveThread.Start();
-        }
-
-        /// <summary>
-        /// Builds File Dialog Filter
-        /// </summary>
-        private string BuildExportFilter()
-        {
-            string result = "";
-
-            string defaultExtension = Settings.Get("extension", ".obj");
-
-            foreach (var converter in ModelConverter.Converters)
-            {
-                string filter = String.Format("{0}|*{1}|", converter.Value.ToString(), converter.Key);
-
-                if (converter.Key == defaultExtension)
-                    result = filter + result;
-                else
-                    result += filter;
-            }
-
-            // Purge trailing bar
-            return result.Remove(result.Length - 1);
-
         }
 
         #endregion
@@ -583,6 +516,14 @@ namespace SEModelViewer
         {
             Settings.Set("showgrid", ShowGrid.IsChecked == true ? "yes" : "no");
             ViewGrid.Visible = ShowGrid.IsChecked == true;
+        }
+
+        /// <summary>
+        /// Enables/Disables Grid on Check
+        /// </summary>
+        private void YUpAxis_Checked(object sender, RoutedEventArgs e)
+        {
+            Settings.Set("yupaxis", UseYUpAxis.IsChecked == true ? "yes" : "no");
         }
 
         #endregion
@@ -630,82 +571,6 @@ namespace SEModelViewer
                 EndThread = false;
                 LoadFolder(folderDialog.SelectedPath);
             }
-        }
-
-        /// <summary>
-        /// Exports selected models on click
-        /// </summary>
-        private void ExportModel_Click(object sender, RoutedEventArgs e)
-        {
-            if (ActiveThread?.IsAlive == true)
-            {
-                MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (ModelList.SelectedItems.Count == 0)
-            {
-                MessageBox.Show("No model/s selected.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // If we're only exporting 1 Model, just show a standard dialog 
-            if(ModelList.SelectedItems.Count < 2)
-            {
-                if (ModelList.SelectedItem is ModelFile modelFile)
-                {
-                    var fileSaveDialog = new SaveFileDialog()
-                    {
-                        Filter = BuildExportFilter(),
-                        Title = "Export selected model",
-                        FileName = modelFile.Name
-                    };
-                    
-                    try
-                    {
-                        if (fileSaveDialog.ShowDialog() == true)
-                        {
-                            string extension = Path.GetExtension(fileSaveDialog.FileName);
-                            Settings.Set("extension", extension);
-                            ModelConverter.Get(extension).FromSEModel(modelFile.Path, fileSaveDialog.FileName);
-                        }
-                    }
-                    catch(Exception exception)
-                    {
-                        Trace.WriteLine(exception);
-                        MessageBox.Show(String.Format("Unhandled exception occured. Error:\n\n{0}", exception), "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                    
-                }
-            }
-            else
-            {
-                ExportMultiple(ModelList.SelectedItems.Cast<ModelFile>().ToList());
-            }
-        }
-
-        /// <summary>
-        /// Exports all listed models on click
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ExportAll_Click(object sender, RoutedEventArgs e)
-        {
-            if (ActiveThread?.IsAlive == true)
-            {
-                MessageBox.Show("Please wait for SEModelViewer to finish the current task.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (ModelList.Items.Count == 0)
-            {
-                MessageBox.Show("No models listed.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            EndThread = false;
-
-            ExportMultiple(ModelList.Items.Cast<ModelFile>().ToList());
         }
 
         /// <summary>
@@ -826,7 +691,7 @@ namespace SEModelViewer
         /// <summary>
         /// Aborts current task
         /// </summary>
-        private void AbortTask_Click(object sender, RoutedEventArgs e)
+        private void AbortTaskClick(object sender, RoutedEventArgs e)
         {
             TaskProgress.IsIndeterminate = false;
             TaskBarProgress.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
@@ -1011,5 +876,43 @@ namespace SEModelViewer
         }
 
         #endregion
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Check for CTRL/CTRL+Shift Modifier first
+            if(Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) || Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                switch(e.Key)
+                {
+                    case Key.C:
+                        {
+                            if (ModelList.SelectedItem is ModelFile modelFile)
+                            {
+                                if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                                    // Have to set this as an array apparently, otherwise Windows won't paste
+                                    Clipboard.SetDataObject(new DataObject(DataFormats.FileDrop, new string[] { modelFile.Path }));
+                                // Just copy name
+                                else
+                                    Clipboard.SetText(modelFile?.Name);
+                            }
+                            break;
+                        }
+                    case Key.X:
+                        {
+                            if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                                ClearLoadedModels();
+                            else
+                                AbortTaskClick(null, null);
+                            break;
+                        }
+                }
+            }
+
+        }
+
+        private void AbortTaskDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ClearLoadedModels();
+        }
     }
 }

@@ -21,48 +21,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Helix="http://helix-toolkit.org/wpf"
+        PreviewKeyDown="Window_KeyDown"
         mc:Ignorable="d"
-        Title="SEModelViewer" Height="600" Width="1000" Background="#FF212121" MinWidth="800" MinHeight="450" Closing="Window_Closing">
+        Title="SEModelViewer" Height="540" Width="950" Background="#FF1E2127" MinWidth="950" MinHeight="540" Closing="Window_Closing">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo x:Name="TaskBarProgress"></TaskbarItemInfo>
     </Window.TaskbarItemInfo>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="328" MaxWidth="500"/>
+            <ColumnDefinition Width="385" MaxWidth="500"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <StackPanel VerticalAlignment="Top" Grid.ColumnSpan="2" Height="20">
-            <Menu Width="Auto" Height="20">
-                <MenuItem Header="_File" Height="20">
-                    <MenuItem x:Name="OpenSEModel" Header="_Import SEModels" Click="LoadButton_Click" HorizontalAlignment="Left" Width="210" />
-                    <MenuItem x:Name="OpenFolder" Header="_Import Folder" Click="LoadFolderButton_Click" HorizontalAlignment="Left" Width="210" />
-                    <Separator />
-                    <MenuItem x:Name="ExportModel" Header="_Export Selected" Click="ExportModel_Click"  HorizontalAlignment="Left" Width="210" />
-                    <MenuItem x:Name="ExportAll" Header="_Export All" Click="ExportAll_Click"  HorizontalAlignment="Left" Width="210" />
-                    <Separator />
-                    <MenuItem x:Name="AppExit" Click="AppExit_Click" Header="_Exit" HorizontalAlignment="Left" Width="210"/>
-                </MenuItem>
-                <MenuItem Header="_Edit">
-                    <MenuItem x:Name="CopyAssetName" Click="CopyAssetName_Click" Header="_Copy Model Name" HorizontalAlignment="Left" Width="200"/>
-                    <MenuItem x:Name="CopyAssetFile" Click="CopyAssetFile_Click" Header="_Copy Model File" HorizontalAlignment="Left" Width="200"/>
-                    <Separator />
-                    <MenuItem x:Name="ClearModels" Click="ClearModels_Click"  Header="_Clear Loaded Models" HorizontalAlignment="Left" Width="200"/>
-                    <MenuItem x:Name="AbortTask" Click="AbortTask_Click" Header="_Cancel Current Task" HorizontalAlignment="Left" Width="200"/>
-                </MenuItem>
-                <MenuItem Header="_Help">
-                    <MenuItem x:Name="Wiki" Header="Wiki" Click="Wiki_Click"  HorizontalAlignment="Left" Width="140"/>
-                    <Separator />
-                    <MenuItem x:Name="About" Header="About" Click="AboutButton_Click" HorizontalAlignment="Left" Width="140"/>
-                </MenuItem>
-            </Menu>
-        </StackPanel>
-        <Helix:HelixViewport3D AllowDrop="True" Drop="MainViewport_Drop" x:Name="MainViewport" Margin="1,20,0,0" Grid.Column="1" >
-            <Helix:HelixViewport3D.Background>
-                <RadialGradientBrush>
-                    <GradientStop Color="#FF424242"/>
-                    <GradientStop Color="#FF232323" Offset="1"/>
-                </RadialGradientBrush>
-            </Helix:HelixViewport3D.Background>
+        <Helix:HelixViewport3D AllowDrop="True" Drop="MainViewport_Drop" x:Name="MainViewport" Grid.Column="1" Background="#FF262B32">
             <Helix:HelixViewport3D.DefaultCamera>
                 <PerspectiveCamera Position="100,100,100" LookDirection="-100,-100,-100" UpDirection="0,0,1" FieldOfView="65" NearPlaneDistance="1"/>
             </Helix:HelixViewport3D.DefaultCamera>
@@ -70,12 +43,12 @@
             <ModelVisual3D x:Name="model"/>
             <Helix:GridLinesVisual3D x:Name="ViewGrid" Width="80" Length="80" MinorDistance="2" MajorDistance="2" Thickness="0.05"/>
         </Helix:HelixViewport3D>
-        <Label x:Name="Status"              Content="Status     : Idle" Margin="11,83,175,0" Foreground="Lime" FontFamily="MS Gothic" Height="23" VerticalAlignment="Top" Grid.Column="1"/>
-        <Label x:Name="VertexCount"         Content="Vertices   : 0" Margin="11,70,175,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
-        <Label x:Name="FaceCount"           Content="Faces      : 0" Margin="11,57,175,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
-        <Label x:Name="MaterialCount"       Content="Materials  : 0" Margin="11,44,175,0" Foreground="Lime" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
-        <Label x:Name="BoneCount"           Content="Bones      : 0" Margin="11,31,175,0" Foreground="Lime" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
-        <ListView x:Name="ModelList" MaxWidth="500" AllowDrop="True" Drop="ModelList_Drop" Margin="0,49,0,26" SelectionChanged="ModelList_SelectionChanged" Background="#FF1F1F1F" Foreground="White" BorderBrush="Black">
+        <Label x:Name="Status"              Content="Status     : Idle" Margin="5,56,181,0" Foreground="#FFABB6C3" FontFamily="MS Gothic" Height="38" VerticalAlignment="Top" Grid.Column="1"/>
+        <Label x:Name="VertexCount"         Content="Vertices   : 0" Margin="5,44,181,0" Foreground="#FFABB6C3" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
+        <Label x:Name="FaceCount"           Content="Faces      : 0" Margin="5,30,181,0" Foreground="#FFABB6C3" Height="26" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
+        <Label x:Name="MaterialCount"       Content="Materials  : 0" Margin="5,17,181,0" Foreground="#FFABB6C3" Height="27" VerticalAlignment="Top" FontFamily="MS Gothic" Grid.Column="1"/>
+        <Label x:Name="BoneCount"           Content="Bones      : 0" Margin="5,4,181,0" Foreground="#FFABB6C3" FontFamily="MS Gothic" Height="26" VerticalAlignment="Top" Grid.Column="1"/>
+        <ListView x:Name="ModelList" MaxWidth="500" AllowDrop="True" Drop="ModelList_Drop" Margin="47,30,0,27" SelectionChanged="ModelList_SelectionChanged" Background="#FF1E2127" Foreground="White" BorderBrush="{x:Null}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="220" DisplayMemberBinding="{Binding Name}">
@@ -91,11 +64,139 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <CheckBox x:Name="LoadTextures" Checked="LoadTextures_Checked" Unchecked="LoadTextures_Checked" IsChecked="True" Content="Load Textures" HorizontalAlignment="Left" Margin="11,0,0,10" VerticalAlignment="Bottom" Width="120" Foreground="White" Grid.Column="1" Height="15" ToolTip="Load the textures when a model is loaded."/>
-        <TextBox x:Name="SearchBox" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" Height="29" Margin="0,20,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Background="#FF232323" Foreground="White" BorderBrush="Black" ToolTip="Search query, separate by spaces for multisearch."/>
-        <Button x:Name="ModeInfoClickButton" Click="ModeInfoClickButton_Click"  Content="Model Info" Grid.Column="1" Margin="0,30,10,0" VerticalAlignment="Top" Height="27" HorizontalAlignment="Right" Width="111" ToolTip="Show model material and bone info."/>
-        <ProgressBar x:Name="TaskProgress" Height="27" VerticalAlignment="Bottom" Background="#FF1F1F1F" BorderBrush="Black" Foreground="#FF3E403F"/>
-        <CheckBox x:Name="ShowGrid" Checked="ShowGrid_Checked" Unchecked="ShowGrid_Checked"  IsChecked="True" Content="Show Grid" HorizontalAlignment="Left" Margin="131,0,0,10" VerticalAlignment="Bottom" Width="120" Foreground="White" Grid.Column="1" Height="15" ToolTip="Show the 3D Grid"/>
-        <Label x:Name="TaskLabel" Content="Idle" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Foreground="White" Height="27" ToolTip="No tasks are currently being run."/>
+        <CheckBox x:Name="LoadTextures" Checked="LoadTextures_Checked" Unchecked="LoadTextures_Checked" IsChecked="True" Content="Load Textures" HorizontalAlignment="Left" Margin="11,0,0,10" VerticalAlignment="Bottom" Width="111" Foreground="White" Grid.Column="1" Height="15" ToolTip="Load the textures when a model is loaded."/>
+        <TextBox x:Name="SearchBox" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" Height="30" Margin="47,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Background="#FF21262C" Foreground="White" BorderBrush="#FF21262C" ToolTip="Search query, separate by spaces for multisearch."/>
+        <Button x:Name="ModeInfoClickButton" Style="{StaticResource NormalButton}" Click="ModeInfoClickButton_Click"  Content="Model Info" Grid.Column="1" Margin="0,10,10,0" VerticalAlignment="Top" Height="27" HorizontalAlignment="Right" Width="111" ToolTip="Show model material and bone info."/>
+        <ProgressBar x:Name="TaskProgress" Height="27" IsIndeterminate="False" VerticalAlignment="Bottom" Background="#FF21262C" BorderBrush="#FF21262C" Foreground="#FF3A424B" Margin="47,0,0,0"/>
+        <CheckBox x:Name="ShowGrid" Checked="ShowGrid_Checked" Unchecked="ShowGrid_Checked"  IsChecked="True" Content="Show Grid" HorizontalAlignment="Left" Margin="122,0,0,10" VerticalAlignment="Bottom" Width="82" Foreground="White" Grid.Column="1" Height="15" ToolTip="Show the 3D Grid"/>
+        <Label x:Name="TaskLabel" Content="Idle" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Foreground="White" Height="27" ToolTip="No tasks are currently being run." Margin="47,0,0,0" Background="{x:Null}"/>
+        <Rectangle Fill="#FF262B32" Margin="0,0,338,0"/>
+        <!-- Open Files Button -->
+        <Button Style="{StaticResource SidebarButton}" HorizontalAlignment="Left"  Width="47" Click="LoadButton_Click"  Margin="0,47,0,0" Height="47" VerticalAlignment="Top">
+            <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+                <Canvas Name="Capa_1" Canvas.Left="0" Canvas.Top="0" Width="58" Height="58">
+                    <Canvas.RenderTransform>
+                        <TranslateTransform X="0" Y="0"/>
+                    </Canvas.RenderTransform>
+                    <Canvas.Resources/>
+                    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path2" Fill="#FF343A42" StrokeThickness="0.76271188">
+                        <Path.Data>
+                            <PathGeometry Figures="M 42.213203 51.118644 H 8.0749827 c -0.7855932 0 -1.3568644 -0.745932 -1.1516949 -1.50483 L 14.677017 28.356271 c 0.140339 -0.520169 0.612457 -0.881695 1.151694 -0.881695 h 34.138221 c 0.785593 0 1.151695 0.750509 1.151695 1.504831 l -7.753729 21.257542 c -0.140339 0.52017 -0.612458 0.881695 -1.151695 0.881695 z" FillRule="NonZero"/>
+                        </Path.Data>
+                    </Path>
+                    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path4" Fill="#FF67717E" StrokeThickness="0.76271188">
+                        <Path.Data>
+                            <PathGeometry Figures="m 14.677017 28.356271 c 0.140339 -0.520169 0.612457 -0.881695 1.151694 -0.881695 H 41.966084 V 18.322034 L 30.525406 6.8813559 H 12.983034 V 33.000424 Z" FillRule="NonZero"/>
+                        </Path.Data>
+                    </Path>
+                    <Canvas Name="g10">
+                        <Canvas.RenderTransform>
+                            <MatrixTransform Matrix="0.76271186 0 0 0.76271186 6.8813386 6.8813559"/>
+                        </Canvas.RenderTransform>
+                        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path6" Fill="#FF3E464F">
+                            <Path.Data>
+                                <PathGeometry Figures="M 50.268 18 H 46 v 9 h 6 V 19.732 C 52 18.775 51.224 18 50.268 18 Z" FillRule="NonZero"/>
+                            </Path.Data>
+                        </Path>
+                        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path8" Fill="#FF3E464F">
+                            <Path.Data>
+                                <PathGeometry Figures="M 8 11 H 1.732 C 0.776 11 0 11.775 0 12.732 V 55.46 c 0.069 0.002 0.138 0.006 0.205 0.01 L 8 34.212 Z" FillRule="NonZero"/>
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+                    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path12" Fill="#FF505761" StrokeThickness="0.76271188">
+                        <Path.Data>
+                            <PathGeometry Figures="m 25.949135 19.084746 h -7.627118 c -0.421017 0 -0.762712 -0.340932 -0.762712 -0.762712 0 -0.42178 0.341695 -0.762712 0.762712 -0.762712 h 7.627118 c 0.421017 0 0.762712 0.340932 0.762712 0.762712 0 0.42178 -0.341695 0.762712 -0.762712 0.762712 z" FillRule="NonZero"/>
+                        </Path.Data>
+                    </Path>
+                    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path14" Fill="#FF505761" StrokeThickness="0.76271188">
+                        <Path.Data>
+                            <PathGeometry Figures="m 25.949135 13.745763 h -7.627118 c -0.421017 0 -0.762712 -0.340932 -0.762712 -0.762712 0 -0.42178 0.341695 -0.762712 0.762712 -0.762712 h 7.627118 c 0.421017 0 0.762712 0.340932 0.762712 0.762712 0 0.42178 -0.341695 0.762712 -0.762712 0.762712 z" FillRule="NonZero"/>
+                        </Path.Data>
+                    </Path>
+                    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path16" Fill="#FF505761" StrokeThickness="0.76271188">
+                        <Path.Data>
+                            <PathGeometry Figures="M 36.627101 24.423729 H 18.322017 c -0.421017 0 -0.762712 -0.340932 -0.762712 -0.762712 0 -0.42178 0.341695 -0.762712 0.762712 -0.762712 h 18.305084 c 0.421017 0 0.762712 0.340932 0.762712 0.762712 0 0.42178 -0.341695 0.762712 -0.762712 0.762712 z" FillRule="NonZero"/>
+                        </Path.Data>
+                    </Path>
+                    <Polygon xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Points="46,15 31,0 31,15 " Name="polygon18" FillRule="NonZero" Fill="#FF505761">
+                        <Polygon.RenderTransform>
+                            <MatrixTransform Matrix="0.76271186 0 0 0.76271186 6.8813386 6.8813559"/>
+                        </Polygon.RenderTransform>
+                    </Polygon>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <!-- Open Files Button -->
+        <Button Style="{StaticResource SidebarButton}" MouseDoubleClick="AbortTaskDoubleClick" HorizontalAlignment="Left"  Width="47"  Click="AbortTaskClick"  Margin="0,94,0,0" Height="47" VerticalAlignment="Top">
+            <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+                <Canvas Canvas.Left="0" Canvas.Top="0" Width="50" Height="50">
+                    <Canvas.RenderTransform>
+                        <TranslateTransform X="0" Y="0"/>
+                    </Canvas.RenderTransform>
+                    <Canvas.Resources/>
+                    <!--Unknown tag: metadata-->
+                    <!--Unknown tag: sodipodi:namedview-->
+                    <Ellipse xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Canvas.Left="7" Canvas.Top="7" Width="36" Height="36" Name="circle2" Fill="#FF3E464F" StrokeThickness="0.720339"/>
+                    <Polyline xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Points="16,34 25,25 34,16   " Name="polyline4" FillRule="NonZero" StrokeThickness="2" Stroke="#FFFFFFFF" StrokeMiterLimit="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                        <Polyline.RenderTransform>
+                            <MatrixTransform Matrix="0.72033898 0 0 0.72033898 6.9915254 6.9915254"/>
+                        </Polyline.RenderTransform>
+                    </Polyline>
+                    <Polyline xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Points="16,16 25,25 34,34   " Name="polyline6" FillRule="NonZero" StrokeThickness="2" Stroke="#FFFFFFFF" StrokeMiterLimit="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                        <Polyline.RenderTransform>
+                            <MatrixTransform Matrix="0.72033898 0 0 0.72033898 6.9915254 6.9915254"/>
+                        </Polyline.RenderTransform>
+                    </Polyline>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <!-- Open Folder Button -->
+        <Button Style="{StaticResource SidebarButton}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="47" Height="47" Click="LoadFolderButton_Click">
+            <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+                <Canvas Canvas.Left="0" Canvas.Top="0" Width="58" Height="58">
+                    <Canvas.RenderTransform>
+                        <TranslateTransform X="0" Y="0"/>
+                    </Canvas.RenderTransform>
+                    <Canvas.Resources/>
+                    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Fill="#FF343A42" StrokeThickness="0.76271248">
+                        <Path.Data>
+                            <PathGeometry Figures="M 42.213213 46.923743 H 8.0749663 c -0.7855938 0 -1.3568655 -0.745933 -1.1516958 -1.504832 L 14.677005 24.161352 c 0.140339 -0.52017 0.612458 -0.881695 1.151696 -0.881695 h 34.138247 c 0.785594 0 1.151696 0.750509 1.151696 1.504831 l -7.753735 21.257559 c -0.140339 0.52017 -0.612458 0.881696 -1.151696 0.881696 z" FillRule="NonZero"/>
+                        </Path.Data>
+                    </Path>
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <MatrixTransform Matrix="0.76271246 0 0 0.76271246 6.8813213 6.8813386"/>
+                        </Canvas.RenderTransform>
+                        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Fill="#FF3E464F">
+                            <Path.Data>
+                                <PathGeometry Figures="M 50.268 12.5 H 25 l -5 -7 H 1.732 C 0.776 5.5 0 6.275 0 7.232 V 49.96 c 0.069 0.002 0.138 0.006 0.205 0.01 L 10.22 22.656 C 10.404 21.973 11.023 21.5 11.73 21.5 H 52 V 14.232 C 52 13.275 51.224 12.5 50.268 12.5 Z" FillRule="NonZero"/>
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <!-- Open Folder Button -->
+        <Button Style="{StaticResource SidebarButton}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="47" Height="47" Click="AboutButton_Click">
+            <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+                <Canvas Canvas.Left="0" Canvas.Top="0" Width="50" Height="50">
+                    <Canvas.RenderTransform>
+                        <TranslateTransform X="0" Y="0"/>
+                    </Canvas.RenderTransform>
+                    <Canvas.Resources/>
+                    <!--Unknown tag: metadata-->
+                    <!--Unknown tag: sodipodi:namedview-->
+                    <Ellipse xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Canvas.Left="7" Canvas.Top="7" Width="36" Height="36" Fill="#FF3E464F" StrokeThickness="0.720339"/>
+                    <Line xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" X1="25" Y1="33.64407" X2="25" Y2="35.084747" Name="line4" StrokeThickness="1.440678" Stroke="#FFFFFFFF" StrokeMiterLimit="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" StrokeThickness="1.440678" Stroke="#FFFFFFFF" StrokeMiterLimit="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+                        <Path.Data>
+                            <PathGeometry Figures="m 19.957627 18.516949 c 0 -2.808602 2.296441 -5.081271 5.114407 -5.041652 2.6775 0.03746 4.932881 2.292118 4.970339 4.970339 0.02521 1.808771 -0.901865 3.402161 -2.312288 4.311949 C 25.976059 23.888517 25 25.908347 25 27.995169 v 2.047204" FillRule="NonZero"/>
+                        </Path.Data>
+                    </Path>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <CheckBox x:Name="UseYUpAxis" Checked="YUpAxis_Checked" Unchecked="YUpAxis_Checked"  IsChecked="True" Content="Use Y Up Axis" HorizontalAlignment="Left" Margin="209,0,0,10" VerticalAlignment="Bottom" Width="108" Foreground="White" Grid.Column="1" Height="15" ToolTip="Use Y Up Axis instead of Z"/>
     </Grid>
 </Window>

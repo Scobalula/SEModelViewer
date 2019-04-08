@@ -48,7 +48,15 @@ namespace SEModelViewer.Util
             /// </summary>
             public int Parent { get; set; }
 
+            /// <summary>
+            /// Bone Index
+            /// </summary>
             public int Index { get; set; }
+
+            /// <summary>
+            /// Bone Position
+            /// </summary>
+            public Vector3 Position = new Vector3();
         }
 
         /// <summary>

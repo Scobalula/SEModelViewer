@@ -24,6 +24,6 @@
         Title="Model Info" Height="350" Width="500" WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow">
     <Grid Background="#FF1F1F1F">
-        <TreeView x:Name="InfoList" Background="#FF292929" BorderBrush="Black" Foreground="White"/>
+        <TreeView x:Name="InfoList" Background="#FF1E2127" BorderBrush="#FF6B7485" Foreground="White"/>
     </Grid>
 </Window>

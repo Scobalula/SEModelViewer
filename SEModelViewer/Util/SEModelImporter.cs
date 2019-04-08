@@ -23,6 +23,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using SELib;
+using SELib.Utilities;
 using HelixToolkit.Wpf;
 using System.Linq;
 
@@ -45,6 +46,8 @@ namespace SEModelViewer.Util
             ".JPG",
             ".JPEG",
             ".BMP",
+            ".DDS",
+            ".TGA",
         };
 
         /// <summary>
@@ -78,6 +81,11 @@ namespace SEModelViewer.Util
         public string Folder { get; set; }
 
         /// <summary>
+        /// Model Up Axis (X or Y)
+        /// </summary>
+        public string UpAxis { get; set; }
+
+        /// <summary>
         /// Random Int (For material loader)
         /// </summary>
         private readonly Random RandomInt = new Random();
@@ -103,6 +111,38 @@ namespace SEModelViewer.Util
         private readonly List<Mesh> Meshes = new List<Mesh>();
 
         /// <summary>
+        /// Axis Values
+        /// </summary>
+        public Dictionary<string, Vector3[]> Axes = new Dictionary<string, Vector3[]>()
+        {
+            { "Z", new Vector3[]
+            {
+                new Vector3(1.000000f, 0.000000f, 0.000000f),
+                new Vector3(0.000000f, 1.000000f, 0.000000f),
+                new Vector3(0.000000f, 0.000000f, 1.000000f),
+            }
+            },
+            { "Y", new Vector3[]
+            {
+                new Vector3(1.000000f, 0.000000f, 0.000000f),
+                new Vector3(0.000000f, 0.000000f, 1.000000f),
+                new Vector3(0.000000f, 1.000000f, 0.000000f),
+            }
+            },
+        };
+
+        /// <summary>
+        /// Computes Dot Product of the 2 Vectors
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public float DotProduct(Vector3 a, Vector3 b)
+        {
+            return (float)((a.X * b.X) + (a.Y * b.Y) + (a.Z * b.Z));
+        }
+
+        /// <summary>
         /// Loads SEModel
         /// </summary>
         public override Model3DGroup Read(Stream s)
@@ -122,6 +162,10 @@ namespace SEModelViewer.Util
 
             foreach(var semesh in semodel.Meshes)
             {
+                // Validate material index
+                if (semesh.MaterialReferenceIndicies[0] < 0 || semesh.MaterialReferenceIndicies[0] > MaterialCount)
+                    continue;
+
                 Mesh mesh = new Mesh
                 {
                     Positions = new List<Point3D>(),
@@ -136,9 +180,20 @@ namespace SEModelViewer.Util
 
                 foreach(var vertex in semesh.Verticies)
                 {
-                    mesh.Positions.Add(new Point3D(vertex.Position.X, vertex.Position.Y, vertex.Position.Z));
+                    var position = new Vector3(
+                        DotProduct(vertex.Position, Axes[UpAxis][0]),
+                        DotProduct(vertex.Position, Axes[UpAxis][1]),
+                        DotProduct(vertex.Position, Axes[UpAxis][2])
+                        );
+                    var normal = new Vector3(
+                        DotProduct(vertex.VertexNormal, Axes[UpAxis][0]),
+                        DotProduct(vertex.VertexNormal, Axes[UpAxis][1]),
+                        DotProduct(vertex.VertexNormal, Axes[UpAxis][2])
+                        );
+
+                    mesh.Positions.Add(new Point3D(position.X, position.Y, position.Z));
                     mesh.TextureCoordinates.Add(new Point(vertex.UVSets[0].X, vertex.UVSets[0].Y));
-                    mesh.Normals.Add(new Vector3D(vertex.VertexNormal.X, vertex.VertexNormal.Y, vertex.VertexNormal.Z));
+                    mesh.Normals.Add(new Vector3D(normal.X, normal.Y, normal.Z));
                 }
 
                 foreach(var face in semesh.Faces )
@@ -166,6 +221,7 @@ namespace SEModelViewer.Util
                     Name     = semodel.Bones[i].BoneName,
                     Index    = i,
                     Parent   = semodel.Bones[i].BoneParent,
+                    Position = semodel.Bones[i].GlobalPosition
                 });
             }
         }
@@ -178,21 +234,21 @@ namespace SEModelViewer.Util
             foreach(var material in semodel.Materials)
             {
                 SEModelMaterials.Add(material);
-
                 var materialGroup = new MaterialGroup();
 
-                var data = material.MaterialData as SEModelSimpleMaterial;
 
+                var data = material.MaterialData as SEModelSimpleMaterial;
                 string image = Path.Combine(Folder, data.DiffuseMap);
 
+                // If we have an image, we can load it, otherwise, assign a random color
                 if (File.Exists(image) && AcceptedImageExtensions.Contains(Path.GetExtension(image).ToUpper()) && LoadTextures == true)
                 {
                     materialGroup.Children.Add(new DiffuseMaterial(CreateTextureBrush(image)));
                 }
                 else
                 {
-                    // Assign a random color
-                    materialGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb
+                    materialGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(
+                        System.Windows.Media.Color.FromRgb
                         (
                             (byte)RandomInt.Next(128, 255),
                             (byte)RandomInt.Next(128, 255),
@@ -209,9 +265,30 @@ namespace SEModelViewer.Util
         /// </summary>
         private ImageBrush CreateTextureBrush(string path)
         {
-            var img = new BitmapImage(new Uri(path, UriKind.Relative));
-            var textureBrush = new ImageBrush(img) { Opacity = 1.0, ViewportUnits = BrushMappingMode.Absolute, TileMode = TileMode.Tile };
-            return textureBrush;
+            // For DDS/TGA we need to use a Scratch Image, everything else, we load directly
+            if(Path.GetExtension(path).ToLower() == ".dds" || Path.GetExtension(path).ToLower() == ".tga")
+            {
+                using (var scratchImage = new PhilLibX.Imaging.ScratchImage(path))
+                {
+                    scratchImage.ConvertImage(PhilLibX.Imaging.ScratchImage.DXGIFormat.R8G8B8A8UNORM);
+                    using (var bitmap = scratchImage.ToBitmap())
+                    {
+                        var bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                            bitmap.GetHbitmap(),
+                            IntPtr.Zero,
+                            Int32Rect.Empty,
+                            BitmapSizeOptions.FromEmptyOptions());
+                        var textureBrush = new ImageBrush(bitmapSource) { Opacity = 1.0, ViewportUnits = BrushMappingMode.Absolute, TileMode = TileMode.Tile };
+                        return textureBrush;
+                    }
+                }
+            }
+            else
+            {
+                var img = new BitmapImage(new Uri(path, UriKind.Relative));
+                var textureBrush = new ImageBrush(img) { Opacity = 1.0, ViewportUnits = BrushMappingMode.Absolute, TileMode = TileMode.Tile };
+                return textureBrush;
+            }
         }
 
         /// <summary>

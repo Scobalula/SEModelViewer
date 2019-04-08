@@ -23,11 +23,11 @@
         mc:Ignorable="d"
         Title="About SEModelViewer" Height="325.833" Width="365.333" WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize" WindowStyle="ToolWindow">
-    <Grid Background="#FF292929">
+    <Grid Background="#FF1E2127">
         <Label Content="SEModelViewer - Shows some SEModel stuffs" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="10,162,10,0" VerticalAlignment="Top" Height="27" Width="339" Background="{x:Null}" Foreground="White"/>
         <Label Content="Developed by Scobalula - SELib by DTZxPorter"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Margin="10,189,10,0" VerticalAlignment="Top" Height="27" Background="{x:Null}" Foreground="White"/>
-        <Label Content="Version: v0.6.0-Alpha"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Margin="10,216,10,0" VerticalAlignment="Top" Height="27" Background="{x:Null}" Foreground="White"/>
-        <Button x:Name="DonateButton" Click="DonateButton_Click" Content="Donate" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Height="27" VerticalAlignment="Bottom"/>
+        <Label Content="Version: v0.7.0-Alpha"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Margin="10,216,10,0" VerticalAlignment="Top" Height="27" Background="{x:Null}" Foreground="White"/>
+        <Button Style="{StaticResource NormalButton}" x:Name="DonateButton" Click="DonateButton_Click" Content="Donate" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Height="27" VerticalAlignment="Bottom"/>
         <Image Height="152" VerticalAlignment="Top" Source="/SEModelViewer;component/Icons/main_icon.png" Margin="100,10,100,0"/>
     </Grid>
 </Window>

@@ -25,7 +25,7 @@ using System.Windows;
 [assembly: AssemblyTitle("SEModelViewer")]
 [assembly: AssemblyDescription("Tool to view SEModel Files")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Philip/Scobalula")]
 [assembly: AssemblyProduct("SEModelViewer")]
 [assembly: AssemblyCopyright("Copyright © Philip/Scobalula 2018")]
 [assembly: AssemblyTrademark("")]

@@ -22,13 +22,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SEModelViewer.Windows"
         mc:Ignorable="d"
-        Title="Export files" Height="255.836" Width="650.752" Background="#FF292929"  WindowStartupLocation="CenterOwner"
+        Title="Export files" Height="255.836" Width="650.752" Background="#FF1E2127"  WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize" WindowStyle="ToolWindow" Closing="Window_Closing">
     <Grid>
-        <Border BorderBrush="White" BorderThickness="1" Margin="10,14,10,10"/>
-        <Label Content="Export" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" Width="44" Background="#FF292929" Foreground="White"/>
+        <Border BorderBrush="#FF454D5D" BorderThickness="1" Margin="10,14,10,10"/>
+        <Label Content="Export" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" Width="44" Background="#FF1E2127" Foreground="White"/>
         <Label Content="Folder:" HorizontalAlignment="Left" Margin="20,28,0,0" VerticalAlignment="Top" Width="85" Height="24" Foreground="White"/>
-        <TextBox x:Name="OutputFolder" TextWrapping="NoWrap" VerticalContentAlignment="Center" Height="24" Margin="110,28,47,0" VerticalAlignment="Top" Foreground="White" BorderBrush="Black" Background="#FF232323" ToolTip="The folder to export the models to. If a relative path is given, then the models will be exported to a subdirectory of the application."/>
+        <TextBox x:Name="OutputFolder" TextWrapping="NoWrap" VerticalContentAlignment="Center" Height="24" Margin="110,28,47,0" VerticalAlignment="Top" Foreground="White" BorderBrush="#FF323742" Background="#FF1E2127" ToolTip="The folder to export the models to. If a relative path is given, then the models will be exported to a subdirectory of the application."/>
         <Button x:Name="SetFolder" Click="SetFolder_Click" Content="..." Margin="0,28,18,0" VerticalAlignment="Top" Height="24" BorderBrush="Black" HorizontalAlignment="Right" Width="24" ToolTip="Select a folder to export to."/>
         <Label Content="Format:" HorizontalAlignment="Left" Margin="20,57,0,0" VerticalAlignment="Top" Width="85" Height="24" Foreground="White"/>
         <ComboBox x:Name="Formats" Margin="110,57,18,0" VerticalAlignment="Top" Height="24" SelectedIndex="0" ToolTip="The format to export the models to."/>

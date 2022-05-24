@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>SEModelViewer</RootNamespace>
     <AssemblyName>SEModelViewer</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -81,21 +81,11 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HelixToolkit, Version=2.6.1.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
-      <HintPath>..\packages\HelixToolkit.2.6.1\lib\netstandard1.1\HelixToolkit.dll</HintPath>
+    <Reference Include="HelixToolkit, Version=2.20.2.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HelixToolkit.2.20.2\lib\netstandard1.1\HelixToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="HelixToolkit.Wpf, Version=2.6.1.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
-      <HintPath>..\packages\HelixToolkit.Wpf.2.6.1\lib\net45\HelixToolkit.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="PhilLibX">
-      <HintPath>..\..\PhilLibX\src\PhilLibX\x64\Release\PhilLibX.dll</HintPath>
-    </Reference>
-    <Reference Include="PhilLibX.Interop">
-      <HintPath>..\..\PhilLibX\src\PhilLibX\x64\Release\PhilLibX.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="SELib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\SELib.dll</HintPath>
+    <Reference Include="HelixToolkit.Wpf, Version=2.20.2.0, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HelixToolkit.Wpf.2.20.2\lib\net45\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -123,9 +113,6 @@
     <Compile Include="Util\ColumnSorter.cs" />
     <Compile Include="Util\Common.cs" />
     <Compile Include="Util\FolderUtil.cs" />
-    <Compile Include="Windows\FileExportDialog.xaml.cs">
-      <DependentUpon>FileExportDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\ModelInfoWindow.xaml.cs">
       <DependentUpon>ModelInfoWindow.xaml</DependentUpon>
     </Compile>
@@ -133,10 +120,6 @@
     <Compile Include="Util\Rotation.cs" />
     <Compile Include="Util\SettingsUtil.cs" />
     <Page Include="Windows\AboutWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\FileExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -201,6 +184,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\main_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SELib\SELib.csproj">
+      <Project>{e03da150-718d-4ea9-afca-d3e17a7df3e8}</Project>
+      <Name>SELib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

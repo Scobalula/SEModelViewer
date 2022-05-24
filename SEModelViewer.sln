@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEModelViewer", "SEModelViewer\SEModelViewer.csproj", "{CB3D5B0F-C40A-4F30-8D24-EBD658A9ED4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SELib", "SELib\SELib.csproj", "{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,24 @@ Global
 		{CB3D5B0F-C40A-4F30-8D24-EBD658A9ED4E}.Release|x64.Build.0 = Release|x64
 		{CB3D5B0F-C40A-4F30-8D24-EBD658A9ED4E}.Release|x86.ActiveCfg = Release|x86
 		{CB3D5B0F-C40A-4F30-8D24-EBD658A9ED4E}.Release|x86.Build.0 = Release|x86
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Debug|x64.Build.0 = Debug|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Debug|x86.Build.0 = Debug|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Profile|Any CPU.ActiveCfg = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Profile|Any CPU.Build.0 = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Profile|x64.ActiveCfg = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Profile|x64.Build.0 = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Profile|x86.ActiveCfg = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Profile|x86.Build.0 = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Release|x64.ActiveCfg = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Release|x64.Build.0 = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Release|x86.ActiveCfg = Release|Any CPU
+		{E03DA150-718D-4EA9-AFCA-D3E17A7DF3E8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

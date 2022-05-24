@@ -1,19 +1,6 @@
 ﻿// ------------------------------------------------------------------------
 // SEModelViewer - Tool to view SEModel Files
 // Copyright (C) 2018 Philip/Scobalula
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ------------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
@@ -46,8 +33,6 @@ namespace SEModelViewer.Util
             ".JPG",
             ".JPEG",
             ".BMP",
-            ".DDS",
-            ".TGA",
         };
 
         /// <summary>
@@ -104,11 +89,6 @@ namespace SEModelViewer.Util
         /// Helix Materials
         /// </summary>
         private readonly List<Material> Materials = new List<Material>();
-
-        /// <summary>
-        /// SEModel Meshes
-        /// </summary>
-        private readonly List<Mesh> Meshes = new List<Mesh>();
 
         /// <summary>
         /// Axis Values
@@ -241,7 +221,7 @@ namespace SEModelViewer.Util
                 string image = Path.Combine(Folder, data.DiffuseMap);
 
                 // If we have an image, we can load it, otherwise, assign a random color
-                if (File.Exists(image) && AcceptedImageExtensions.Contains(Path.GetExtension(image).ToUpper()) && LoadTextures == true)
+                if (File.Exists(image) && AcceptedImageExtensions.Contains(Path.GetExtension(image), StringComparer.CurrentCultureIgnoreCase) && LoadTextures == true)
                 {
                     materialGroup.Children.Add(new DiffuseMaterial(CreateTextureBrush(image)));
                 }
@@ -265,30 +245,9 @@ namespace SEModelViewer.Util
         /// </summary>
         private ImageBrush CreateTextureBrush(string path)
         {
-            // For DDS/TGA we need to use a Scratch Image, everything else, we load directly
-            if(Path.GetExtension(path).ToLower() == ".dds" || Path.GetExtension(path).ToLower() == ".tga")
-            {
-                using (var scratchImage = new PhilLibX.Imaging.ScratchImage(path))
-                {
-                    scratchImage.ConvertImage(PhilLibX.Imaging.ScratchImage.DXGIFormat.R8G8B8A8UNORM);
-                    using (var bitmap = scratchImage.ToBitmap())
-                    {
-                        var bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                            bitmap.GetHbitmap(),
-                            IntPtr.Zero,
-                            Int32Rect.Empty,
-                            BitmapSizeOptions.FromEmptyOptions());
-                        var textureBrush = new ImageBrush(bitmapSource) { Opacity = 1.0, ViewportUnits = BrushMappingMode.Absolute, TileMode = TileMode.Tile };
-                        return textureBrush;
-                    }
-                }
-            }
-            else
-            {
-                var img = new BitmapImage(new Uri(path, UriKind.Relative));
-                var textureBrush = new ImageBrush(img) { Opacity = 1.0, ViewportUnits = BrushMappingMode.Absolute, TileMode = TileMode.Tile };
-                return textureBrush;
-            }
+            var img = new BitmapImage(new Uri(path, UriKind.Relative));
+            var textureBrush = new ImageBrush(img) { Opacity = 1.0, ViewportUnits = BrushMappingMode.Absolute, TileMode = TileMode.Tile };
+            return textureBrush;
         }
 
         /// <summary>

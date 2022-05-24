@@ -1,4 +1,8 @@
-﻿using System;
+﻿// ------------------------------------------------------------------------
+// SEModelViewer - Tool to view SEModel Files
+// Copyright (C) 2018 Philip/Scobalula
+// ------------------------------------------------------------------------
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
